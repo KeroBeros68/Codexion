@@ -24,7 +24,8 @@ NAME = codexion
 OBJ_DIR = Obj
 
 COD = \
-		coders.c
+		coders.c \
+		parsing.c
 
 SRCS =	$(COD)
 
@@ -96,10 +97,8 @@ fclean: clean
 	fi
 
 push:
-	git add .
-	git commit -m "$(M)"
-	git push
+	cd .. && git add . && git commit -m "$(M)" && git push
 
 re: fclean all
 
-.PHONY: clean fclean re bonus
+.PHONY: clean fclean re bonus push
