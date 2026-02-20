@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/19 12:52:30 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/19 12:53:40 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 11:40:19 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ static bool	schedule_validation(char *value, t_data *data)
 	else if (!strcmp(value, "EDF") || !strcmp(value, "edf"))
 		data->scheduler = EDF;
 	else
-		return (false);
+		return (cod_error(data,
+				"schedule_validation, invalid data for scheduler"));
 	return (true);
 }
 
@@ -49,6 +50,7 @@ static int	ft_isdigit(int c)
 static bool	number_validation(void *data, char *s)
 {
 	long long	*ptr;
+	char		*str;
 
 	ptr = (long long *)data;
 	if (ft_str_check(s, ft_isdigit))
@@ -56,7 +58,8 @@ static bool	number_validation(void *data, char *s)
 		*ptr = atoi(s);
 		return (true);
 	}
-	return (false);
+	str = "number_validation, invalid arguments, must be a positive integer";
+	return (cod_error(data, str));
 }
 
 bool	parser(char **av, t_data *data)

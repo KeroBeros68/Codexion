@@ -27,7 +27,8 @@ COD = \
 		coders.c \
 		parsing.c \
 		init.c \
-		clean.c
+		clean.c \
+		error.c
 
 SRCS =	$(COD)
 

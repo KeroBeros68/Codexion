@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:05:29 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 11:11:46 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 11:33:53 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,14 @@ static bool	init_dongle(t_data *data)
 
 	data->dongle_list = malloc(sizeof(t_dongle) * data->nb_coders);
 	if (!data->dongle_list)
-		return (false);
+		return (cod_error(data, "init_dongle, failled malloc dongle_list"));
 
 	while (i < data->nb_coders)
 	{
 		data->dongle_list[i].id = i + 1;
 
 		if (pthread_mutex_init(&data->dongle_list[i].dongle_lock, NULL) != 0)
-			return (false);
+			return (cod_error(data, "init_dongle, failled init mutex"));
 		i++;
 	}
 	return (true);
@@ -41,7 +41,7 @@ static bool	init_coder(t_data *data)
 
 	data->coder_list = malloc(sizeof(t_coder) * data->nb_coders);
 	if (!data->coder_list)
-		return (false);
+		return (cod_error(data, "init_coder, failled malloc coder_list"));
 
 	while (i < data->nb_coders)
 	{
@@ -59,9 +59,9 @@ static bool	init_coder(t_data *data)
 bool	init(t_data *data)
 {
 	if (pthread_mutex_init(&data->log_lock, NULL) != 0)
-		return (false);
+		return (cod_error(data, "init, failled init mutex log_lock"));
 	if (pthread_mutex_init(&data->death_lock, NULL) != 0)
-		return (false);
+		return (cod_error(data, "init, failled init mutex death_lock"));
 
 	if (!init_dongle(data))
 		return (false);
