@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:19:14 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/19 12:55:54 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/19 18:03:39 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@ enum	e_scheduler_type
 
 typedef struct s_dongle
 {
-	int		id;
-
+	int				id;
+	pthread_mutex_t	dongle_lock;
 }	t_dongle;
 
 typedef struct s_coder
@@ -54,8 +54,8 @@ typedef struct s_data
 
 	enum e_scheduler_type	scheduler;
 
-	pthread_mutex_t			*log_lock;
-	pthread_mutex_t			*death_lock;
+	pthread_mutex_t			log_lock;
+	pthread_mutex_t			death_lock;
 
 	t_dongle				*dongle_list;
 	t_coder					*coder_list;
