@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:19:14 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 17:59:00 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 18:33:25 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <pthread.h>
 # include <string.h>
 # include <unistd.h>
+# include <sys/time.h>
 
 enum	e_scheduler_type
 {
@@ -62,6 +63,8 @@ typedef struct s_data
 	pthread_mutex_t			log_lock;
 	pthread_mutex_t			death_lock;
 
+	struct timeval			start_time;
+
 	t_dongle				*dongle_list;
 	t_coder					*coder_list;
 }	t_data;
@@ -80,5 +83,6 @@ void		stop_thread(t_data *data, pthread_t *threads);
 
 void		*coder_routine(void *arg);
 
+void		log_message(t_coder *coder, char *mes);
 
 #endif

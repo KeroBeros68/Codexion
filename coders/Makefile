@@ -30,7 +30,8 @@ COD = \
 		clean.c \
 		error.c \
 		utils.c \
-		threads.c
+		threads.c \
+		logs.c
 
 SRCS =	$(COD)
 

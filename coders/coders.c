@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:18:59 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 17:57:58 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 18:32:41 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ void	print_coders_info(t_data *data)
 	}
 }
 
+
+
 void	*coder_routine(void *arg)
 {
 	t_coder	*coder;
@@ -35,11 +37,23 @@ void	*coder_routine(void *arg)
 	coder = (t_coder *)arg;
 	while (i < coder->data->nb_compile)
 	{
-		usleep(coder->data->time_burnout);
-		printf("j atend\n");
+
+		log_message(coder, "has taken a dongle");
+		pthread_mutex_lock(&coder->left_dongle->dongle_lock);
+		log_message(coder, "has taken a dongle");
+		pthread_mutex_lock(&coder->right_dongle->dongle_lock);
+		log_message(coder, "is compiling");
+		usleep(coder->data->time_compile);
+		pthread_mutex_unlock(&coder->left_dongle->dongle_lock);
+		pthread_mutex_unlock(&coder->right_dongle->dongle_lock);
+
+		log_message(coder, "is debugging");
+		usleep(coder->data->time_debug);
+
+		log_message(coder, "is refactoring");
+		usleep(coder->data->time_refactor);
 		i++;
 	}
-	printf("je suis mort\n");
 	return (NULL);
 }
 
@@ -55,13 +69,13 @@ int	main(int ac, char **av)
 		return (1);
 	if (!init(&data))
 		return (1);
+	gettimeofday(&data.start_time, NULL);
 	threads = malloc(sizeof(pthread_t) * data.nb_coders);
 	if (!threads)
 		return (clean(&data), cod_error(&data,
 				"Main, failled malloc thread"), 1);
 	if (!start_thread(&data, threads))
 		return (1);
-
 	stop_thread(&data, threads);
 	return (0);
 }
