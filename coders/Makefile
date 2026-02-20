@@ -26,7 +26,8 @@ OBJ_DIR = Obj
 COD = \
 		coders.c \
 		parsing.c \
-		init.c
+		init.c \
+		clean.c
 
 SRCS =	$(COD)
 
