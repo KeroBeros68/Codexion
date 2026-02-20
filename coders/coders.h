@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:19:14 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 18:33:25 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 20:43:45 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,4 +85,5 @@ void		*coder_routine(void *arg);
 
 void		log_message(t_coder *coder, char *mes);
 
+void		mysleep(long time_in_ms);
 #endif

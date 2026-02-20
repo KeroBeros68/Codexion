@@ -31,7 +31,9 @@ COD = \
 		error.c \
 		utils.c \
 		threads.c \
-		logs.c
+		logs.c \
+		cod_routine.c \
+		my_sleep.c
 
 SRCS =	$(COD)
 

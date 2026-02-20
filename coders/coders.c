@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:18:59 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 18:32:41 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 18:36:29 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,37 +24,6 @@ void	print_coders_info(t_data *data)
 		printf("Right dongle ID: %d\n\n", data->coder_list[i].right_dongle->id);
 		i++;
 	}
-}
-
-
-
-void	*coder_routine(void *arg)
-{
-	t_coder	*coder;
-	int		i;
-
-	i = 0;
-	coder = (t_coder *)arg;
-	while (i < coder->data->nb_compile)
-	{
-
-		log_message(coder, "has taken a dongle");
-		pthread_mutex_lock(&coder->left_dongle->dongle_lock);
-		log_message(coder, "has taken a dongle");
-		pthread_mutex_lock(&coder->right_dongle->dongle_lock);
-		log_message(coder, "is compiling");
-		usleep(coder->data->time_compile);
-		pthread_mutex_unlock(&coder->left_dongle->dongle_lock);
-		pthread_mutex_unlock(&coder->right_dongle->dongle_lock);
-
-		log_message(coder, "is debugging");
-		usleep(coder->data->time_debug);
-
-		log_message(coder, "is refactoring");
-		usleep(coder->data->time_refactor);
-		i++;
-	}
-	return (NULL);
 }
 
 int	main(int ac, char **av)
