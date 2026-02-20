@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:19:14 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 11:55:10 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 17:59:00 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,19 @@ typedef struct s_data
 	t_coder					*coder_list;
 }	t_data;
 
-bool	parser(char **av, t_data *data);
-bool	init(t_data *data);
-bool	clean(t_data *data);
-bool	cod_error(t_data *data, char *msg);
+bool		parser(char **av, t_data *data);
+bool		init(t_data *data);
+bool		clean(t_data *data);
+bool		cod_error(t_data *data, char *msg);
+
+uint64_t	ft_atou64_s(const char *nptr, bool *error);
+int			ft_isdigit(int c);
+bool		ft_str_check(char *s, int (*f)(int));
+
+bool		start_thread(t_data *data, pthread_t *threads);
+void		stop_thread(t_data *data, pthread_t *threads);
+
+void		*coder_routine(void *arg);
+
 
 #endif

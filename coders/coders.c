@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:18:59 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 11:55:53 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 17:57:58 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,29 +29,39 @@ void	print_coders_info(t_data *data)
 void	*coder_routine(void *arg)
 {
 	t_coder	*coder;
+	int		i;
 
+	i = 0;
 	coder = (t_coder *)arg;
-	printf("coucou - avant sleep avec time_burnout: %lu\n", coder->data->time_burnout);
-	usleep(coder->data->time_burnout);
+	while (i < coder->data->nb_compile)
+	{
+		usleep(coder->data->time_burnout);
+		printf("j atend\n");
+		i++;
+	}
 	printf("je suis mort\n");
 	return (NULL);
 }
 
 int	main(int ac, char **av)
 {
-	t_data	data;
-	pthread_t thread;
+	t_data		data;
+	pthread_t	*threads;
 
 	memset(&data, 0, sizeof(t_data));
 	if (ac < 9)
 		return (1);
-	if (!parser(av, &data)) //si oui sortie en erreur, penser a safe le atoi
+	if (!parser(av, &data))
 		return (1);
 	if (!init(&data))
 		return (1);
-	//print_coders_info(&data);
-	pthread_create(&thread, NULL, coder_routine, &data.coder_list[1]);
-	pthread_join(thread, NULL);
-	clean(&data);
+	threads = malloc(sizeof(pthread_t) * data.nb_coders);
+	if (!threads)
+		return (clean(&data), cod_error(&data,
+				"Main, failled malloc thread"), 1);
+	if (!start_thread(&data, threads))
+		return (1);
+
+	stop_thread(&data, threads);
 	return (0);
 }
