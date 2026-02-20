@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:05:29 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 11:33:53 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 11:46:48 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ static bool	init_coder(t_data *data)
 			data->coder_list[i].right_dongle = &data->dongle_list[0];
 		else
 			data->coder_list[i].right_dongle = &data->dongle_list[i + 1];
+		data->coder_list[i].data = data;
 		i++;
 	}
 	return (true);

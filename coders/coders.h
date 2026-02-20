@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:19:14 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 11:25:41 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 11:55:10 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,15 @@
 # include <limits.h>
 # include <pthread.h>
 # include <string.h>
+# include <unistd.h>
 
 enum	e_scheduler_type
 {
 	FIFO = 0,
 	EDF = 1
 };
+
+typedef struct s_data	t_data;
 
 typedef struct s_dongle
 {
@@ -39,6 +42,8 @@ typedef struct s_coder
 
 	t_dongle	*left_dongle;
 	t_dongle	*right_dongle;
+
+	t_data		*data;
 }	t_coder;
 
 typedef struct s_data
