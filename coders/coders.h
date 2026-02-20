@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:19:14 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/19 18:03:39 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 11:11:11 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,5 +62,6 @@ typedef struct s_data
 }	t_data;
 
 bool	parser(char **av, t_data *data);
+bool	init(t_data *data);
 
 #endif

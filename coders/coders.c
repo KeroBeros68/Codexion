@@ -6,49 +6,12 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:18:59 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 10:41:38 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/20 11:06:00 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
 #include <stdlib.h>
-
-bool	init(t_data *data)
-{
-	int			i;
-
-	i = 0;
-	data->dongle_list = malloc(sizeof(t_dongle) * data->nb_coders);
-	if (!data->dongle_list)
-		return (false);
-	while (i < data->nb_coders)
-	{
-		data->dongle_list[i].id = i + 1;
-
-		if (pthread_mutex_init(&data->dongle_list[i].dongle_lock, NULL) != 0)
-			return (false);
-		i++;
-	}
-	data->coder_list = malloc(sizeof(t_coder) * data->nb_coders);
-	if (!data->coder_list)
-		return (false);
-	if (pthread_mutex_init(&data->log_lock, NULL) != 0)
-		return (false);
-	if (pthread_mutex_init(&data->death_lock, NULL) != 0)
-		return (false);
-	i = 0;
-	while (i < data->nb_coders)
-	{
-		data->coder_list[i].id = i + 1;
-		data->coder_list[i].left_dongle = &data->dongle_list[i];
-		if (i + 1 == data->nb_coders)
-			data->coder_list[i].right_dongle = &data->dongle_list[0];
-		else
-			data->coder_list[i].right_dongle = &data->dongle_list[i + 1];
-		i++;
-	}
-	return (true);
-}
 
 bool	clean(t_data *data)
 {
@@ -86,6 +49,11 @@ void	print_coders_info(t_data *data)
 		printf("Right dongle ID: %d\n\n", data->coder_list[i].right_dongle->id);
 		i++;
 	}
+}
+
+void	coder_routine(void)
+{
+	printf("coucou");
 }
 
 int	main(int ac, char **av)
