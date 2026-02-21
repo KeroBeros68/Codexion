@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 11:05:29 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 11:46:48 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/21 15:24:24 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ static bool	init_dongle(t_data *data)
 	int	i;
 
 	i = 0;
-
 	data->dongle_list = malloc(sizeof(t_dongle) * data->nb_coders);
 	if (!data->dongle_list)
 		return (cod_error(data, "init_dongle, failled malloc dongle_list"));
@@ -25,6 +24,7 @@ static bool	init_dongle(t_data *data)
 	while (i < data->nb_coders)
 	{
 		data->dongle_list[i].id = i + 1;
+		data->dongle_list[i].cooldown_end = 0;
 
 		if (pthread_mutex_init(&data->dongle_list[i].dongle_lock, NULL) != 0)
 			return (cod_error(data, "init_dongle, failled init mutex"));
@@ -38,7 +38,6 @@ static bool	init_coder(t_data *data)
 	int	i;
 
 	i = 0;
-
 	data->coder_list = malloc(sizeof(t_coder) * data->nb_coders);
 	if (!data->coder_list)
 		return (cod_error(data, "init_coder, failled malloc coder_list"));
@@ -46,6 +45,7 @@ static bool	init_coder(t_data *data)
 	while (i < data->nb_coders)
 	{
 		data->coder_list[i].id = i + 1;
+		data->coder_list[i].last_compile = 0;
 		data->coder_list[i].left_dongle = &data->dongle_list[i];
 		if (i + 1 == data->nb_coders)
 			data->coder_list[i].right_dongle = &data->dongle_list[0];
@@ -69,6 +69,8 @@ bool	init(t_data *data)
 
 	if (!init_coder(data))
 		return (false);
+
+	data->start_simulation = true;
 
 	return (true);
 }

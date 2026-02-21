@@ -33,7 +33,8 @@ COD = \
 		threads.c \
 		logs.c \
 		cod_routine.c \
-		my_sleep.c
+		my_sleep.c \
+		burn_monitor.c
 
 SRCS =	$(COD)
 

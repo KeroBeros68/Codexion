@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:18:59 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/20 18:36:29 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/21 16:25:25 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ int	main(int ac, char **av)
 {
 	t_data		data;
 	pthread_t	*threads;
+	pthread_t	monitors;
 
 	memset(&data, 0, sizeof(t_data));
 	if (ac < 9)
@@ -43,8 +44,8 @@ int	main(int ac, char **av)
 	if (!threads)
 		return (clean(&data), cod_error(&data,
 				"Main, failled malloc thread"), 1);
-	if (!start_thread(&data, threads))
+	if (!start_thread(&data, threads, &monitors))
 		return (1);
-	stop_thread(&data, threads);
+	stop_thread(&data, threads, &monitors);
 	return (0);
 }
