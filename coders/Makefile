@@ -24,6 +24,9 @@ NAME = codexion
 OBJ_DIR = Obj
 
 COD = \
+		error.c \
+		utils.c \
+		parsing.c
 
 SRCS =	$(COD)
 
