@@ -29,8 +29,7 @@ static bool	schedule_validation(char *value, t_sim *sim)
 	else if (!strcmp(value, "edf"))
 		sim->priority = EDF;
 	else
-		return (cod_error(sim,
-				"schedule_validation, invalid data for scheduler"));
+		return (cod_error(sim, ERR_INVALID_SCHEDULER));
 	return (true);
 }
 
@@ -57,8 +56,7 @@ static bool	number_validation(void *dest, char *s, size_t size, t_sim *sim)
 	error = false;
 	if (!ft_str_check(s, ft_isdigit))
 	{
-		return (cod_error(sim,
-				"number_validation, not a positive integer"));
+		return (cod_error(sim, ERR_NOT_POSITIVE_INT));
 	}
 	if (size == sizeof(uint64_t))
 	{
@@ -71,7 +69,7 @@ static bool	number_validation(void *dest, char *s, size_t size, t_sim *sim)
 		*dest_int = (int)ft_atou64_s(s, &error);
 	}
 	if (error)
-		return (cod_error(sim, "number_validation, overflow detected"));
+		return (cod_error(sim, ERR_OVERFLOW));
 	return (true);
 }
 
@@ -100,8 +98,9 @@ bool	parser(char **av, t_sim *sim)
 		|| !number_validation(&sim->time_cooldown, av[7], sizeof(uint64_t), sim)
 		|| !schedule_validation(av[8], sim))
 		return (false);
-	if (sim->nb_coders <= 0 || sim->total_compile <= 0)
-		return (cod_error(sim,
-				"parser, nb_coders and total_compile must be > 0"));
+	if (sim->nb_coders <= 0)
+		return (cod_error(sim, ERR_ZERO_CODERS));
+	if (sim->total_compile <= 0)
+		return (cod_error(sim, ERR_ZERO_COMPILES));
 	return (true);
 }

@@ -28,6 +28,16 @@
 
 /* ******************* DEFINE ******************* */
 
+# define ERR_USAGE			"Usage: ./codexion number_of_coders \
+time_to_burnout time_to_compile time_to_debug \
+time_to_refactor number_of_compiles_required \
+dongle_cooldown scheduler(fifo|edf)\n"
+# define ERR_NOT_POSITIVE_INT	"Argument is not a valid positive integer\n"
+# define ERR_OVERFLOW			"Argument value causes integer overflow\n"
+# define ERR_INVALID_SCHEDULER	"Scheduler must be exactly \"fifo\" or \"edf\"\n"
+# define ERR_ZERO_CODERS		"number_of_coders must be greater than 0\n"
+# define ERR_ZERO_COMPILES		"number_of_compiles_required must be greater than 0\n"
+
 /* ******************** ENUM ******************** */
 
 /* **** Enumeration for Scheduler mode */
