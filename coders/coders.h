@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/25 17:14:36 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/25 17:16:53 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,5 +125,9 @@ void		mysleep(long time_in_ms);
 /* ****	Parser **/
 
 bool		parser(char **av, t_sim *sim);
+
+/* ****	Error ***/
+
+bool		cod_error(t_sim *sim, char *msg);
 
 #endif

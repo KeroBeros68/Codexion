@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 14:04:42 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/25 16:27:07 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/25 17:16:22 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	mysleep(long time_in_ms)
 
 	start = get_timestamp();
 	now = 0;
-	while (now - start < time_in_ms)
+	while (now - start < (uint64_t)time_in_ms)
 	{
 		usleep(500);
 		now = get_timestamp();
