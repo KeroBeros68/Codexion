@@ -6,12 +6,11 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 14:04:42 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/25 14:06:19 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/25 15:41:15 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
-
 
 uint64_t	get_timestamp(void)
 {
