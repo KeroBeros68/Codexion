@@ -97,9 +97,27 @@ fclean: clean
 		echo "$(YELLOW)⚠ Déjà supprimée$(RESET)"; \
 	fi
 
-push:
-	cd .. && git add . && git commit -m "$(M)" && git push
+push_feat:
+	cd .. && git add . && git commit -m "feat: $(M)" && git push
+
+push_fix:
+	cd .. && git add . && git commit -m "fix: $(M)" && git push
+
+push_facto:
+	cd .. && git add . && git commit -m "refactor:$(M)" && git push
+
+push_doc:
+	cd .. && git add . && git commit -m "docs: $(M)" && git push
+
+push_style:
+	cd .. && git add . && git commit -m "style: $(M)" && git push
+
+push_chore:
+	cd .. && git add . && git commit -m "chore: $(M)" && git push
 
 re: fclean all
 
-.PHONY: clean fclean re bonus push
+.PHONY: clean fclean re bonus \
+		 push_chore push_doc \
+		 push_facto push_feat \
+		 push_fix push_style
