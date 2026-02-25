@@ -118,6 +118,9 @@ push_chore:
 
 re: fclean all
 
+run:
+	./codexion 4 5000 400 400 400 200 2 fifo
+
 .PHONY: clean fclean re bonus \
 		 push_chore push_doc \
 		 push_facto push_feat \
