@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/25 15:58:33 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/25 16:28:29 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,9 @@ typedef struct s_sim
 
 /* ****	Utils ***/
 
+bool		ft_str_check(char *s, int (*f)(int));
+int			ft_isdigit(int c);
+uint64_t	ft_atou64_s(const char *nptr, bool *error);
 uint64_t	get_timestamp(void);
 void		mysleep(long time_in_ms);
 
