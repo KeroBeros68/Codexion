@@ -105,7 +105,7 @@ push_fix:
 	cd .. && git add . && git commit -m "fix: $(M)" && git push
 
 push_facto:
-	cd .. && git add . && git commit -m "refactor:$(M)" && git push
+	cd .. && git add . && git commit -m "refactor: $(M)" && git push
 
 push_doc:
 	cd .. && git add . && git commit -m "docs: $(M)" && git push

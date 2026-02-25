@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/25 17:16:53 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/25 17:31:50 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,13 @@ time_to_refactor number_of_compiles_required \
 dongle_cooldown scheduler(fifo|edf)\n"
 # define ERR_NOT_POSITIVE_INT	"Argument is not a valid positive integer\n"
 # define ERR_OVERFLOW			"Argument value causes integer overflow\n"
-# define ERR_INVALID_SCHEDULER	"Scheduler must be exactly \"fifo\" or \"edf\"\n"
+# define ERR_INVALID_SCHEDULER	"Scheduler must be exactly \"fifo\" or \
+\"edf\"\n"
 # define ERR_ZERO_CODERS		"number_of_coders must be greater than 0\n"
-# define ERR_ZERO_COMPILES		"number_of_compiles_required must be greater than 0\n"
+# define ERR_ZERO_COMPILES		"number_of_compiles_required must be greater \
+than 0\n"
+# define ERR_MALLOC_CODERS		"Memory allocation failed for coders table\n"
+# define ERR_MALLOC_DONGLES		"Memory allocation failed for dongles table\n"
 
 /* ******************** ENUM ******************** */
 
