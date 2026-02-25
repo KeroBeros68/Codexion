@@ -24,6 +24,7 @@ NAME = codexion
 OBJ_DIR = Obj
 
 COD = \
+		main.c \
 		error.c \
 		utils.c \
 		parsing.c
