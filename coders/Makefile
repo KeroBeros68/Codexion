@@ -103,22 +103,22 @@ fclean: clean
 	fi
 
 push_feat:
-	cd .. && git add . && git commit -m "feat: $(M)" && git push
+	cd .. && git status && git add . && git commit -m "feat: $(M)" && git push && git status
 
 push_fix:
-	cd .. && git add . && git commit -m "fix: $(M)" && git push
+	cd .. && git status && git add . && git commit -m "fix: $(M)" && git push && git status
 
 push_facto:
-	cd .. && git add . && git commit -m "refactor: $(M)" && git push
+	cd .. && git status && git add . && git commit -m "refactor: $(M)" && git push && git status
 
 push_doc:
-	cd .. && git add . && git commit -m "docs: $(M)" && git push
+	cd .. && git status && git add . && git commit -m "docs: $(M)" && git push && git status
 
 push_style:
-	cd .. && git add . && git commit -m "style: $(M)" && git push
+	cd .. && git status && git add . && git commit -m "style: $(M)" && git push && git status
 
 push_chore:
-	cd .. && git add . && git commit -m "chore: $(M)" && git push
+	cd .. && git status && git add . && git commit -m "chore: $(M)" && git push && git status
 
 re: fclean all
 
