@@ -41,7 +41,7 @@ void	mysleep(long time_in_ms)
 	uint64_t	now;
 
 	start = get_timestamp();
-	now = 0;
+	now = start;
 	while (now - start < (uint64_t)time_in_ms)
 	{
 		usleep(500);

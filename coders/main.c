@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 16:18:59 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/26 17:04:32 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/26 17:46:16 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ int	main(int ac, char **av)
 		return (1);
 	if (!init(&sim))
 		return (clean(&sim), 1);
+	simulation(&sim);
 	clean(&sim);
 	return (0);
 }

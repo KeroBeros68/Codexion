@@ -28,6 +28,7 @@ COD = \
 		init.c \
 		mem.c \
 		logs.c \
+		sim.c \
 		clean.c \
 		error.c \
 		utils.c \
@@ -123,13 +124,13 @@ push_chore:
 re: fclean all
 
 run:
-	./codexion 4 5000 400 400 400 200 2 fifo
+	./codexion 4 5000 400 400 400 2 20 fifo
 
 run_hell:
-	valgrind --tool=helgrind ./codexion 4 5000 400 400 400 200 2 fifo
+	valgrind --tool=helgrind ./codexion 4 5000 400 400 400 2 200 fifo
 
 run_leak:
-	valgrind --leak-check=full ./codexion 4 5000 400 400 400 200 2 fifo
+	valgrind --leak-check=full ./codexion 4 5000 400 400 400 2 200 fifo
 
 .PHONY: clean fclean re bonus \
 		 push_chore push_doc \

@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 17:26:58 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/26 17:31:40 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/26 17:47:39 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	log_message(t_coder *coder, char *mes)
 {
 	uint64_t	timestamp_ms;
 
-	timestamp_ms = get_timestamp();
+	timestamp_ms = get_timestamp() - coder->sim->start_time;
 
 	pthread_mutex_lock(&coder->sim->log_mutex);
 	printf("%llu %d %s\n", (unsigned long long)timestamp_ms, coder->id, mes);
