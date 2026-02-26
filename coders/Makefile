@@ -25,6 +25,9 @@ OBJ_DIR = Obj
 
 COD = \
 		main.c \
+		init.c \
+		mem.c \
+		clean.c \
 		error.c \
 		utils.c \
 		parsing.c
@@ -121,7 +124,14 @@ re: fclean all
 run:
 	./codexion 4 5000 400 400 400 200 2 fifo
 
+run_hell:
+	valgrind --tool=helgrind ./codexion 4 5000 400 400 400 200 2 fifo
+
+run_leak:
+	valgrind --leak-check=full ./codexion 4 5000 400 400 400 200 2 fifo
+
 .PHONY: clean fclean re bonus \
 		 push_chore push_doc \
 		 push_facto push_feat \
-		 push_fix push_style
+		 push_fix push_style \
+		 run_hell run_leak

@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/25 17:31:50 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/26 17:07:52 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ dongle_cooldown scheduler(fifo|edf)\n"
 than 0\n"
 # define ERR_MALLOC_CODERS		"Memory allocation failed for coders table\n"
 # define ERR_MALLOC_DONGLES		"Memory allocation failed for dongles table\n"
+# define ERR_MUTEX_INIT			"Failed to initialize mutex\n"
+# define ERR_COND_INIT			"Failed to initialize condition variable\n"
 
 /* ******************** ENUM ******************** */
 
@@ -66,7 +68,7 @@ typedef struct s_heap_node
 /* **** Heap definition ******/
 typedef struct s_heap
 {
-	t_heap_node	*nodes;
+	t_heap_node	nodes[2];
 	int			size;
 	int			capacity;
 }	t_heap;
@@ -100,15 +102,26 @@ typedef struct s_coder
 	t_sim		*sim;
 }	t_coder;
 
+/* **** Init tracking (true = successfully initialized, needs cleanup) */
+typedef struct s_inited
+{
+	bool	log_mutex;
+	bool	sim_mutex;
+	int		dongle_mutex;
+	int		dongle_cond;
+
+}	t_inited;
+
 /* **** Global Data structure */
 typedef struct s_sim
 {
 	bool			stop_sim;
+	t_inited		inited;
 
 	pthread_t		monitor;
 
 	pthread_mutex_t	log_mutex;
-	pthread_mutex_t	stop_sim_mutex;
+	pthread_mutex_t	sim_mutex;
 
 	t_coder			*tab_coders;
 	t_dongle		*tab_dongles;
@@ -135,6 +148,19 @@ int			ft_isdigit(int c);
 uint64_t	ft_atou64_s(const char *nptr, bool *error);
 uint64_t	get_timestamp(void);
 void		mysleep(long time_in_ms);
+
+/* ****	Mem *****/
+
+void		ft_bzero(void *s, size_t n);
+void		*ft_calloc(size_t nmemb, size_t size);
+
+/* ****	Init ****/
+
+bool		init(t_sim *sim);
+
+/* ****	Clean ***/
+
+void		clean(t_sim *sim);
 
 /* ****	Parser **/
 
