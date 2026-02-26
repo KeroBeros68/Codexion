@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/26 17:07:52 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/26 17:32:09 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,6 +165,10 @@ void		clean(t_sim *sim);
 /* ****	Parser **/
 
 bool		parser(char **av, t_sim *sim);
+
+/* ****	Log *****/
+
+void		log_message(t_coder *coder, char *mes);
 
 /* ****	Error ***/
 

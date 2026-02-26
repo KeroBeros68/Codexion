@@ -27,6 +27,7 @@ COD = \
 		main.c \
 		init.c \
 		mem.c \
+		logs.c \
 		clean.c \
 		error.c \
 		utils.c \
