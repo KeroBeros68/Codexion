@@ -43,6 +43,7 @@ COD = \
 		logs.c \
 		sim.c \
 		monitoring.c \
+		dongles.c \
 		clean.c \
 		error.c \
 		utils.c \

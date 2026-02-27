@@ -6,23 +6,13 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 17:13:52 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 19:31:12 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/27 19:40:59 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
 
-void	take_dongle(t_coder *coder, t_dongle *dongle)
-{
-	pthread_mutex_lock(&dongle->lock);
-	log_message(coder, "has taken a dongle");
-}
 
-void	release_dongle(t_coder *coder, t_dongle *dongle)
-{
-	pthread_mutex_unlock(&dongle->lock);
-	dongle->time_end_cooldown = get_timestamp() + coder->sim->time_cooldown;
-}
 
 void	*coder_routine(void *arg)
 {
@@ -35,10 +25,7 @@ void	*coder_routine(void *arg)
 	{
 		if (stop_sim(self->sim))
 			return (NULL);
-		take_dongle(self, self->right_dongle);
-		if (stop_sim(self->sim))
-			return (NULL);
-		take_dongle(self, self->left_dongle);
+		acquire_dongles(self);
 		if (stop_sim(self->sim))
 			return (NULL);
 		self->deadline = get_timestamp() + self->sim->time_burnout;
