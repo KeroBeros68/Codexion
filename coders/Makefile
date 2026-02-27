@@ -104,25 +104,25 @@ fclean: clean
 	fi
 
 add:
-	cd .. && git status && echo "\n" && git add . && echo "\n" && git status && echo "\n"
+	cd .. && git status && echo "" && git add . && echo "" && git status && echo ""
 
 push_feat: add
-	git commit -m "feat: $(M)" && git push && git status
+	git commit -m "feat: $(M)" && git push && echo "" && git status
 
 push_fix: add
-	git commit -m "fix: $(M)" && git push && git status
+	git commit -m "fix: $(M)" && git push && echo "" && git status
 
 push_facto: add
-	git commit -m "refactor: $(M)" && git push && git status
+	git commit -m "refactor: $(M)" && git push && echo "" && git status
 
 push_doc: add
-	git commit -m "docs: $(M)" && git push && git status
+	git commit -m "docs: $(M)" && git push && echo "" && git status
 
 push_style: add
-	git commit -m "style: $(M)" && git push && git status
+	git commit -m "style: $(M)" && git push && echo "" && git status
 
 push_chore: add
-	git commit -m "chore: $(M)" && git push && git status
+	git commit -m "chore: $(M)" && git push && echo "" && git status
 
 re: fclean all
 
