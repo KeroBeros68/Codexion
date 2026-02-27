@@ -13,6 +13,19 @@ MAGENTA = \033[0;35m
 CYAN    = \033[0;36m
 RESET   = \033[0m
 
+define BANNER
+██ ▄█▀▓█████  ██▀███   ▒█████   ▄▄▄▄   ▓█████  ██▀███   ▒█████    ██████
+ ██▄█▒ ▓█   ▀ ▓██ ▒ ██▒▒██▒  ██▒▓█████▄ ▓█   ▀ ▓██ ▒ ██▒▒██▒  ██▒▒██    ▒ 
+▓███▄░ ▒███   ▓██ ░▄█ ▒▒██░  ██▒▒██▒ ▄██▒███   ▓██ ░▄█ ▒▒██░  ██▒░ ▓██▄   
+▓██ █▄ ▒▓█  ▄ ▒██▀▀█▄  ▒██   ██░▒██░█▀  ▒▓█  ▄ ▒██▀▀█▄  ▒██   ██░  ▒   ██▒
+▒██▒ █▄░▒████▒░██▓ ▒██▒░ ████▓▒░░▓█  ▀█▓░▒████▒░██▓ ▒██▒░ ████▓▒░▒██████▒▒
+▒ ▒▒ ▓▒░░ ▒░ ░░ ▒▓ ░▒▓░░ ▒░▒░▒░ ░▒▓███▀▒░░ ▒░ ░░ ▒▓ ░▒▓░░ ▒░▒░▒░ ▒ ▒▓▒ ▒ ░
+░ ░▒ ▒░ ░ ░  ░  ░▒ ░ ▒░  ░ ▒ ▒░ ▒░▒   ░  ░ ░  ░  ░▒ ░ ▒░  ░ ▒ ▒░ ░ ░▒  ░ ░
+░ ░░ ░    ░     ░░   ░ ░ ░ ░ ▒   ░    ░    ░     ░░   ░ ░ ░ ░ ▒  ░  ░  ░  
+░  ░      ░  ░   ░         ░ ░   ░         ░  ░   ░         ░ ░        ░  
+                                      ░                                   
+endef
+
 # **************************************************************************** #
 #                                  VARIABLES                                   #
 # **************************************************************************** #
@@ -103,26 +116,44 @@ fclean: clean
 		echo "$(YELLOW)⚠ Déjà supprimée$(RESET)"; \
 	fi
 
+
+
 add:
-	cd .. && git status && echo "" && git add . && echo "" && git status && echo ""
+	echo "$(CYAN)--- Status avant ajout ---$(RESET)"
+	git status -s
+	git add .
+	echo "$(GREEN)✔ Fichiers ajoutés.$(RESET)"
 
-push_feat: add
-	git commit -m "feat: $(M)" && git push && echo "" && git status
+_commit: add
+	if [ -z "$(M)" ]; then \
+		echo "\033[0;31mError: Le message du commit (M) est vide !\033[0m"; \
+		exit 1; \
+	fi
+	git commit -m "$(TYPE): $(M)"
+	git push
+	echo "$(GREEN)🚀 Push terminé avec succès ($(TYPE)).$(RESET)"
 
-push_fix: add
-	git commit -m "fix: $(M)" && git push && echo "" && git status
+push_feat:
+	$(MAKE) _commit TYPE=feat M="$(M)"
 
-push_facto: add
-	git commit -m "refactor: $(M)" && git push && echo "" && git status
+push_fix:
+	$(MAKE) _commit TYPE=fix M="$(M)"
 
-push_doc: add
-	git commit -m "docs: $(M)" && git push && echo "" && git status
+push_refactor:
+	$(MAKE) _commit TYPE=refactor M="$(M)"
 
-push_style: add
-	git commit -m "style: $(M)" && git push && echo "" && git status
+push_docs:
+	$(MAKE) _commit TYPE=docs M="$(M)"
 
-push_chore: add
-	git commit -m "chore: $(M)" && git push && echo "" && git status
+push_style:
+	$(MAKE) _commit TYPE=style M="$(M)"
+
+push_chore:
+	$(MAKE) _commit TYPE=chore M="$(M)"
+
+st:
+	@git status
+
 
 re: fclean all
 
@@ -140,4 +171,4 @@ run_leak:
 		 push_facto push_feat \
 		 push_fix push_style \
 		 run_hell run_leak \
-		 add
+		 add st
