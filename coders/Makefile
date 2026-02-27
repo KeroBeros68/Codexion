@@ -122,7 +122,7 @@ add:
 	echo "$(CYAN)--- Status avant ajout ---$(RESET)"
 	git status -s
 	git add .
-	echo "$(GREEN)✔ Fichiers ajoutés.$(RESET)"
+	echo "$(GREEN)✔ Fichiers ajoutés.$(RESET)\n"
 
 _commit: add
 	if [ -z "$(M)" ]; then \
@@ -131,7 +131,7 @@ _commit: add
 	fi
 	git commit -m "$(TYPE): $(M)"
 	git push
-	echo "$(GREEN)🚀 Push terminé avec succès ($(TYPE)).$(RESET)"
+	echo "$(GREEN)🚀 Push terminé avec succès ($(TYPE)).$(RESET)\n"
 
 push_feat:
 	$(MAKE) _commit TYPE=feat M="$(M)"
