@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 19:40:21 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/27 19:58:18 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,8 @@ void		log_message(t_coder *coder, char *mes);
 void		*monitoring(void *arg);
 bool		stop_sim(t_sim *sim);
 void		simulation(t_sim *sim);
+
+/* ****	Dongle **/
 
 bool		acquire_dongles(t_coder *coder);
 void		release_dongle(t_coder *coder, t_dongle *dongle);

@@ -44,6 +44,7 @@ COD = \
 		sim.c \
 		monitoring.c \
 		dongles.c \
+		heap.c \
 		clean.c \
 		error.c \
 		utils.c \
@@ -162,10 +163,10 @@ run:
 	./codexion 10 2000 200 100 200 10 400 fifo
 
 run_hell:
-	valgrind --tool=helgrind ./codexion 10 10000 2000 1000 2000 20 4000 fifo
+	valgrind --tool=helgrind ./codexion 10 2000 200 100 200 10 400 fifo
 
 run_leak:
-	valgrind --leak-check=full ./codexion 10 10000 2000 1000 2000 20 4000 fifo
+	valgrind --leak-check=full ./codexion 10 2000 200 100 200 10 400 fifo
 
 .PHONY: clean fclean re bonus \
 		 push_chore push_doc \
