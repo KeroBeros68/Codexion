@@ -116,13 +116,16 @@ fclean: clean
 		echo "$(YELLOW)⚠ Déjà supprimée$(RESET)"; \
 	fi
 
-
+st:
+	git status
 
 add:
-	echo "$(CYAN)--- Status avant ajout ---$(RESET)"
+	echo "$(CYAN)--- Status ---$(RESET)"
 	git status -s
 	git add .
-	echo "$(GREEN)✔ Fichiers ajoutés.$(RESET)\n"
+	echo "$(GREEN)✔ Files added.$(RESET)"
+	git status -s
+	echo "$(GREEN)✔ Done$(RESET)\n"
 
 _commit: add
 	if [ -z "$(M)" ]; then \
@@ -131,7 +134,7 @@ _commit: add
 	fi
 	git commit -m "$(TYPE): $(M)"
 	git push
-	echo "$(GREEN)🚀 Push terminé avec succès ($(TYPE)).$(RESET)\n"
+	echo "$(GREEN)🚀 Successful push ($(TYPE)).$(RESET)\n"
 
 push_feat:
 	$(MAKE) _commit TYPE=feat M="$(M)"
@@ -150,10 +153,6 @@ push_style:
 
 push_chore:
 	$(MAKE) _commit TYPE=chore M="$(M)"
-
-st:
-	@git status
-
 
 re: fclean all
 
