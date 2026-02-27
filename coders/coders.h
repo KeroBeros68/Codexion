@@ -172,7 +172,9 @@ void		log_message(t_coder *coder, char *mes);
 
 /* ****	Sim *****/
 
+bool		sim_is_stopped(t_sim *sim);
 void		simulation(t_sim *sim);
+void		*monitoring(void *arg);
 
 /* ****	Error ***/
 

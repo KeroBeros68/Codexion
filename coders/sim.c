@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 17:13:52 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 16:53:47 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/27 18:09:45 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,16 @@ void	release_dongle(t_coder *coder, t_dongle *dongle)
 	dongle->time_end_cooldown = get_timestamp() + coder->sim->time_cooldown;
 }
 
+bool	sim_is_stopped(t_sim *sim)
+{
+	bool	stopped;
+
+	pthread_mutex_lock(&sim->sim_mutex);
+	stopped = sim->stop_sim;
+	pthread_mutex_unlock(&sim->sim_mutex);
+	return (stopped);
+}
+
 void	*coder_routine(void *arg)
 {
 	t_coder	*self;
@@ -32,9 +42,15 @@ void	*coder_routine(void *arg)
 	self->time_last_compile = get_timestamp();
 	while (self->nb_compile < self->sim->total_compile)
 	{
+		self->deadline = get_timestamp() + self->sim->time_burnout;
+		if (sim_is_stopped(self->sim))
+			return (NULL);
 		take_dongle(self, self->right_dongle);
+		if (sim_is_stopped(self->sim))
+			return (NULL);
 		take_dongle(self, self->left_dongle);
-
+		if (sim_is_stopped(self->sim))
+			return (NULL);
 		log_message(self, "is compiling");
 		mysleep(self->sim->time_compile);
 
@@ -42,10 +58,13 @@ void	*coder_routine(void *arg)
 		release_dongle(self, self->left_dongle);
 
 		self->time_last_compile = get_timestamp();
-
+		if (sim_is_stopped(self->sim))
+			return (NULL);
 		log_message(self, "is debugging");
 		mysleep(self->sim->time_debug);
 
+		if (sim_is_stopped(self->sim))
+			return (NULL);
 		log_message(self, "is refactoring");
 		mysleep(self->sim->time_refactor);
 		self->nb_compile++;
@@ -65,12 +84,15 @@ void	join_coders(t_sim *sim)
 	}
 }
 
+
+
 void	simulation(t_sim *sim)
 {
 	int	i;
 
 	i = 0;
 	sim->start_time = get_timestamp();
+	pthread_create(&sim->monitor, NULL, monitoring, sim);
 	while (i < sim->nb_coders)
 	{
 		pthread_create(&sim->tab_coders[i].coder_thread, NULL, coder_routine,
@@ -78,6 +100,7 @@ void	simulation(t_sim *sim)
 		i++;
 	}
 	join_coders(sim);
+	pthread_join(sim->monitor, NULL);
 }
 
 

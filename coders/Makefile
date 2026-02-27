@@ -42,6 +42,7 @@ COD = \
 		mem.c \
 		logs.c \
 		sim.c \
+		monitoring.c \
 		clean.c \
 		error.c \
 		utils.c \
@@ -157,7 +158,7 @@ push_chore:
 re: fclean all
 
 run:
-	./codexion 10 10000 2000 1000 2000 20 4000 fifo
+	./codexion 10 1000 200 100 200 10 400 fifo
 
 run_hell:
 	valgrind --tool=helgrind ./codexion 10 10000 2000 1000 2000 20 4000 fifo

@@ -58,6 +58,7 @@ void	init_coders(t_sim *sim)
 	while (i < sim->nb_coders)
 	{
 		sim->tab_coders[i].id = i + 1;
+		sim->tab_coders[i].deadline = UINT64_MAX;
 
 		sim->tab_coders[i].left_dongle = &sim->tab_dongles[i];
 		if (i == sim->nb_coders - 1)
