@@ -6,32 +6,11 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 18:09:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 19:21:23 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/27 19:29:42 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
-
-/*
-** stop_sim
-** Thread-safe read of the simulation stop flag.
-** Acquires sim_mutex before reading stop_sim to prevent data races
-** with the thread that may set it concurrently.
-**
-** @param sim  Pointer to the simulation structure.
-** @return     true if the simulation has been flagged to stop, false otherwise.
-*/
-static bool	stop_sim(t_sim *sim)
-{
-	pthread_mutex_lock(&sim->sim_mutex);
-	if (sim->stop_sim)
-	{
-		pthread_mutex_unlock(&sim->sim_mutex);
-		return (true);
-	}
-	pthread_mutex_unlock(&sim->sim_mutex);
-	return (false);
-}
 
 /*
 ** set_stop_sim
@@ -75,6 +54,27 @@ static bool	check_coders(t_sim *sim, uint64_t current_ms)
 		}
 		i++;
 	}
+	return (false);
+}
+
+/*
+** stop_sim
+** Thread-safe read of the simulation stop flag.
+** Acquires sim_mutex before reading stop_sim to prevent data races
+** with the thread that may set it concurrently.
+**
+** @param sim  Pointer to the simulation structure.
+** @return     true if the simulation has been flagged to stop, false otherwise.
+*/
+bool	stop_sim(t_sim *sim)
+{
+	pthread_mutex_lock(&sim->sim_mutex);
+	if (sim->stop_sim)
+	{
+		pthread_mutex_unlock(&sim->sim_mutex);
+		return (true);
+	}
+	pthread_mutex_unlock(&sim->sim_mutex);
 	return (false);
 }
 
