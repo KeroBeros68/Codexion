@@ -103,23 +103,26 @@ fclean: clean
 		echo "$(YELLOW)⚠ Déjà supprimée$(RESET)"; \
 	fi
 
-push_feat:
-	cd .. && git status && git add . && git status && git commit -m "feat: $(M)" && git push && git status
+add:
+	cd .. && git status && echo "\n" && git add . && echo "\n" && git status && echo "\n"
 
-push_fix:
-	cd .. && git status && git add . && git status && git commit -m "fix: $(M)" && git push && git status
+push_feat: add
+	git commit -m "feat: $(M)" && git push && git status
 
-push_facto:
-	cd .. && git status && git add . && git status && git commit -m "refactor: $(M)" && git push && git status
+push_fix: add
+	git commit -m "fix: $(M)" && git push && git status
 
-push_doc:
-	cd .. && git status && git add . && git status && git commit -m "docs: $(M)" && git push && git status
+push_facto: add
+	git commit -m "refactor: $(M)" && git push && git status
 
-push_style:
-	cd .. && git status && git add . && git status && git commit -m "style: $(M)" && git push && git status
+push_doc: add
+	git commit -m "docs: $(M)" && git push && git status
 
-push_chore:
-	cd .. && git status && git add . && git status && git commit -m "chore: $(M)" && git push && git status
+push_style: add
+	git commit -m "style: $(M)" && git push && git status
+
+push_chore: add
+	git commit -m "chore: $(M)" && git push && git status
 
 re: fclean all
 
@@ -136,4 +139,5 @@ run_leak:
 		 push_chore push_doc \
 		 push_facto push_feat \
 		 push_fix push_style \
-		 run_hell run_leak
+		 run_hell run_leak \
+		 add
