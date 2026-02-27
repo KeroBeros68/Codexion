@@ -158,7 +158,7 @@ push_chore:
 re: fclean all
 
 run:
-	./codexion 10 1000 200 100 200 10 400 fifo
+	./codexion 10 2000 200 100 200 10 400 fifo
 
 run_hell:
 	valgrind --tool=helgrind ./codexion 10 10000 2000 1000 2000 20 4000 fifo

@@ -40,9 +40,9 @@ void	*coder_routine(void *arg)
 
 	self = (t_coder *)arg;
 	self->time_last_compile = get_timestamp();
+	self->deadline = get_timestamp() + self->sim->time_burnout;
 	while (self->nb_compile < self->sim->total_compile)
 	{
-		self->deadline = get_timestamp() + self->sim->time_burnout;
 		if (sim_is_stopped(self->sim))
 			return (NULL);
 		take_dongle(self, self->right_dongle);
@@ -51,6 +51,7 @@ void	*coder_routine(void *arg)
 		take_dongle(self, self->left_dongle);
 		if (sim_is_stopped(self->sim))
 			return (NULL);
+		self->deadline = get_timestamp() + self->sim->time_burnout;
 		log_message(self, "is compiling");
 		mysleep(self->sim->time_compile);
 
@@ -100,6 +101,9 @@ void	simulation(t_sim *sim)
 		i++;
 	}
 	join_coders(sim);
+	pthread_mutex_lock(&sim->sim_mutex);
+	sim->stop_sim = true;
+	pthread_mutex_unlock(&sim->sim_mutex);
 	pthread_join(sim->monitor, NULL);
 }
 

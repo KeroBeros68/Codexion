@@ -6,16 +6,95 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 18:09:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 18:15:11 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/27 19:21:23 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
 
+/*
+** stop_sim
+** Thread-safe read of the simulation stop flag.
+** Acquires sim_mutex before reading stop_sim to prevent data races
+** with the thread that may set it concurrently.
+**
+** @param sim  Pointer to the simulation structure.
+** @return     true if the simulation has been flagged to stop, false otherwise.
+*/
+static bool	stop_sim(t_sim *sim)
+{
+	pthread_mutex_lock(&sim->sim_mutex);
+	if (sim->stop_sim)
+	{
+		pthread_mutex_unlock(&sim->sim_mutex);
+		return (true);
+	}
+	pthread_mutex_unlock(&sim->sim_mutex);
+	return (false);
+}
+
+/*
+** set_stop_sim
+** Thread-safe write of the simulation stop flag.
+** Acquires sim_mutex before setting stop_sim to true, ensuring that
+** no other thread reads a partially written value.
+**
+** @param sim  Pointer to the simulation structure.
+*/
+static void	set_stop_sim(t_sim *sim)
+{
+	pthread_mutex_lock(&sim->sim_mutex);
+	sim->stop_sim = true;
+	pthread_mutex_unlock(&sim->sim_mutex);
+}
+
+/*
+** check_coders
+** Iterates over all coders and checks whether any of them has exceeded
+** its deadline without having completed all required compilations.
+** If a burnout is detected, logs the event and returns true immediately.
+** Coders that have already reached total_compile are skipped, as their
+** deadline is no longer meaningful.
+**
+** @param sim         Pointer to the simulation structure.
+** @param current_ms  Current timestamp in milliseconds.
+** @return            true if at least one coder burned out, false otherwise.
+*/
+static bool	check_coders(t_sim *sim, uint64_t current_ms)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->nb_coders)
+	{
+		if (current_ms > sim->tab_coders[i].deadline
+			&& sim->tab_coders[i].nb_compile != sim->total_compile)
+		{
+			log_message(&sim->tab_coders[i], "burned out");
+			return (true);
+		}
+		i++;
+	}
+	return (false);
+}
+
+/*
+** monitoring
+** Entry point for the monitor thread. Runs concurrently with all coder
+** threads and polls the simulation state every 100 microseconds.
+** On each iteration it checks whether the stop flag has already been
+** raised (e.g. by simulation() after a normal finish), then scans all
+** coders for a burnout condition via check_coders().
+** If a burnout is detected, the stop flag is set and the thread exits.
+** The 100 µs poll granularity ensures the 10 ms detection constraint
+** is always satisfied.
+**
+** @param arg  Pointer to the t_sim structure cast as void *.
+** @return     Always NULL.
+*/
 void	*monitoring(void *arg)
 {
 	t_sim			*sim;
-	int				i;
 	uint64_t		current_ms;
 
 	sim = (t_sim *)arg;
@@ -23,26 +102,14 @@ void	*monitoring(void *arg)
 	while (1)
 	{
 		usleep(100);
-		pthread_mutex_lock(&sim->sim_mutex);
-		if (sim->stop_sim)
-		{
-			pthread_mutex_unlock(&sim->sim_mutex);
+		if (stop_sim(sim))
 			return (NULL);
-		}
-		pthread_mutex_unlock(&sim->sim_mutex);
-		i = 0;
+
 		current_ms = get_timestamp();
-		while (i < sim->nb_coders)
+		if (check_coders(sim, current_ms))
 		{
-			if (current_ms > sim->tab_coders[i].deadline)
-			{
-				log_message(&sim->tab_coders[i], "burned out");
-				pthread_mutex_lock(&sim->sim_mutex);
-				sim->stop_sim = true;
-				pthread_mutex_unlock(&sim->sim_mutex);
-				return (NULL);
-			}
-			i++;
+			set_stop_sim(sim);
+			return (NULL);
 		}
 	}
 	return (NULL);
