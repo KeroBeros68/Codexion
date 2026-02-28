@@ -12,9 +12,8 @@
 
 #include "coders.h"
 
-bool	cod_error(t_sim *sim, char *msg)
+bool	cod_error(char *msg)
 {
-	(void)sim;
 	fprintf(stderr, "ERROR: %s", msg);
 	return (false);
 }

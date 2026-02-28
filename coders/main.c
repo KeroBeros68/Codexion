@@ -18,7 +18,7 @@ int	main(int ac, char **av)
 
 	ft_bzero(&sim, sizeof(t_sim));
 	if (ac != 9)
-		return (cod_error(&sim, ERR_USAGE), 1);
+		return (cod_error(ERR_USAGE), 1);
 	if (!parser(av, &sim))
 		return (1);
 	if (!init(&sim))

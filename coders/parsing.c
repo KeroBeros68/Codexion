@@ -29,7 +29,7 @@ static bool	schedule_validation(char *value, t_sim *sim)
 	else if (!strcmp(value, "edf"))
 		sim->priority = EDF;
 	else
-		return (cod_error(sim, ERR_INVALID_SCHEDULER));
+		return (cod_error(ERR_INVALID_SCHEDULER));
 	return (true);
 }
 
@@ -47,7 +47,7 @@ static bool	schedule_validation(char *value, t_sim *sim)
 ** @param sim   Pointer to the simulation structure, used for error reporting.
 ** @return      true on success, false on invalid input or overflow.
 */
-static bool	number_validation(void *dest, char *s, size_t size, t_sim *sim)
+static bool	number_validation(void *dest, char *s, size_t size)
 {
 	uint64_t	*dest_u64;
 	int			*dest_int;
@@ -56,7 +56,7 @@ static bool	number_validation(void *dest, char *s, size_t size, t_sim *sim)
 	error = false;
 	if (!ft_str_check(s, ft_isdigit))
 	{
-		return (cod_error(sim, ERR_NOT_POSITIVE_INT));
+		return (cod_error(ERR_NOT_POSITIVE_INT));
 	}
 	if (size == sizeof(uint64_t))
 	{
@@ -69,7 +69,7 @@ static bool	number_validation(void *dest, char *s, size_t size, t_sim *sim)
 		*dest_int = (int)ft_atou64_s(s, &error);
 	}
 	if (error)
-		return (cod_error(sim, ERR_OVERFLOW));
+		return (cod_error(ERR_OVERFLOW));
 	return (true);
 }
 
@@ -89,18 +89,18 @@ static bool	number_validation(void *dest, char *s, size_t size, t_sim *sim)
 */
 bool	parser(char **av, t_sim *sim)
 {
-	if (!number_validation(&sim->nb_coders, av[1], sizeof(int), sim)
-		|| !number_validation(&sim->time_burnout, av[2], sizeof(uint64_t), sim)
-		|| !number_validation(&sim->time_compile, av[3], sizeof(uint64_t), sim)
-		|| !number_validation(&sim->time_debug, av[4], sizeof(uint64_t), sim)
-		|| !number_validation(&sim->time_refactor, av[5], sizeof(uint64_t), sim)
-		|| !number_validation(&sim->total_compile, av[6], sizeof(int), sim)
-		|| !number_validation(&sim->time_cooldown, av[7], sizeof(uint64_t), sim)
+	if (!number_validation(&sim->nb_coders, av[1], sizeof(int))
+		|| !number_validation(&sim->time_burnout, av[2], sizeof(uint64_t))
+		|| !number_validation(&sim->time_compile, av[3], sizeof(uint64_t))
+		|| !number_validation(&sim->time_debug, av[4], sizeof(uint64_t))
+		|| !number_validation(&sim->time_refactor, av[5], sizeof(uint64_t))
+		|| !number_validation(&sim->total_compile, av[6], sizeof(int))
+		|| !number_validation(&sim->time_cooldown, av[7], sizeof(uint64_t))
 		|| !schedule_validation(av[8], sim))
 		return (false);
 	if (sim->nb_coders <= 0)
-		return (cod_error(sim, ERR_ZERO_CODERS));
+		return (cod_error(ERR_ZERO_CODERS));
 	if (sim->total_compile <= 0)
-		return (cod_error(sim, ERR_ZERO_COMPILES));
+		return (cod_error(ERR_ZERO_COMPILES));
 	return (true);
 }

@@ -29,13 +29,12 @@ bool	init_dongles(t_sim *sim)
 	i = 0;
 	while (i < sim->nb_coders)
 	{
-		sim->tab_dongles[i].id = i + 1;
 		sim->tab_dongles[i].waitlist.capacity = 2;
 		if (pthread_mutex_init(&sim->tab_dongles[i].lock, NULL) != 0)
-			return (cod_error(sim, ERR_MUTEX_INIT));
+			return (cod_error(ERR_MUTEX_INIT));
 		sim->inited.dongle_mutex++;
 		if (pthread_cond_init(&sim->tab_dongles[i].cond, NULL) != 0)
-			return (cod_error(sim, ERR_COND_INIT));
+			return (cod_error(ERR_COND_INIT));
 		sim->inited.dongle_cond++;
 		i++;
 	}
@@ -69,9 +68,9 @@ bool	init_coders(t_sim *sim)
 
 		sim->tab_coders[i].sim = sim;
 		if (pthread_mutex_init(&sim->tab_coders[i].cond_dead, NULL) != 0)
-			return (cod_error(sim, ERR_MUTEX_INIT));
+			return (cod_error(ERR_MUTEX_INIT));
 		if (pthread_mutex_init(&sim->tab_coders[i].cond_nb_comp, NULL) != 0)
-			return (cod_error(sim, ERR_MUTEX_INIT));
+			return (cod_error(ERR_MUTEX_INIT));
 		i++;
 	}
 	return (true);
@@ -93,18 +92,18 @@ bool	init(t_sim *sim)
 {
 	sim->tab_coders = ft_calloc(sim->nb_coders, sizeof(t_coder));
 	if (!sim->tab_coders)
-		return (cod_error(sim, ERR_MALLOC_CODERS));
+		return (cod_error(ERR_MALLOC_CODERS));
 	sim->tab_dongles = ft_calloc(sim->nb_coders, sizeof(t_dongle));
 	if (!sim->tab_dongles)
-		return (cod_error(sim, ERR_MALLOC_DONGLES));
+		return (cod_error(ERR_MALLOC_DONGLES));
 
 	if (pthread_mutex_init(&sim->coder_finish_mutex, NULL) != 0)
-		return (cod_error(sim, ERR_MUTEX_INIT));
+		return (cod_error(ERR_MUTEX_INIT));
 	if (pthread_mutex_init(&sim->log_mutex, NULL) != 0)
-		return (cod_error(sim, ERR_MUTEX_INIT));
+		return (cod_error(ERR_MUTEX_INIT));
 	sim->inited.log_mutex = true;
 	if (pthread_mutex_init(&sim->sim_mutex, NULL) != 0)
-		return (cod_error(sim, ERR_MUTEX_INIT));
+		return (cod_error(ERR_MUTEX_INIT));
 	sim->inited.sim_mutex = true;
 
 	if (!init_dongles(sim))

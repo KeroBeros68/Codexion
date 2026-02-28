@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 21:59:55 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 22:47:45 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@
 # include <string.h>
 # include <unistd.h>
 # include <sys/time.h>
-# include <errno.h>
 
 /* ******************* DEFINE ******************* */
 
@@ -76,8 +75,6 @@ typedef struct s_heap
 /* **** Dongle definition *****/
 typedef struct s_dongle
 {
-	int				id;
-
 	pthread_mutex_t	lock;
 	pthread_cond_t	cond;
 
@@ -203,6 +200,6 @@ t_heap_node	heap_peek(t_heap *heap);
 
 /* ****	Error ***/
 
-bool		cod_error(t_sim *sim, char *msg);
+bool		cod_error(char *msg);
 
 #endif
