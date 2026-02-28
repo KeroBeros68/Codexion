@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 17:32:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/26 16:57:13 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 21:25:43 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ bool	init_dongles(t_sim *sim)
 **
 ** @param sim  Pointer to the simulation structure.
 */
-void	init_coders(t_sim *sim)
+bool	init_coders(t_sim *sim)
 {
 	int	i;
 
@@ -68,8 +68,13 @@ void	init_coders(t_sim *sim)
 			sim->tab_coders[i].right_dongle = &sim->tab_dongles[i + 1];
 
 		sim->tab_coders[i].sim = sim;
+		if (pthread_mutex_init(&sim->tab_coders[i].cond_dead, NULL) != 0)
+			return (cod_error(sim, ERR_MUTEX_INIT));
+		if (pthread_mutex_init(&sim->tab_coders[i].cond_nb_comp, NULL) != 0)
+			return (cod_error(sim, ERR_MUTEX_INIT));
 		i++;
 	}
+	return (true);
 }
 
 /*
@@ -93,6 +98,8 @@ bool	init(t_sim *sim)
 	if (!sim->tab_dongles)
 		return (cod_error(sim, ERR_MALLOC_DONGLES));
 
+	if (pthread_mutex_init(&sim->coder_finish_mutex, NULL) != 0)
+		return (cod_error(sim, ERR_MUTEX_INIT));
 	if (pthread_mutex_init(&sim->log_mutex, NULL) != 0)
 		return (cod_error(sim, ERR_MUTEX_INIT));
 	sim->inited.log_mutex = true;
@@ -102,6 +109,7 @@ bool	init(t_sim *sim)
 
 	if (!init_dongles(sim))
 		return (false);
-	init_coders(sim);
+	if (!init_coders(sim))
+		return (false);
 	return (true);
 }

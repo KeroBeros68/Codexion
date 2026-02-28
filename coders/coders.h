@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 21:38:52 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 21:35:17 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,18 +88,20 @@ typedef struct s_dongle
 /* **** Coder definition ******/
 typedef struct s_coder
 {
-	int			id;
-	int			nb_compile;
+	int				id;
+	int				nb_compile;
 
-	pthread_t	coder_thread;
+	pthread_t		coder_thread;
+	pthread_mutex_t	cond_dead;
+	pthread_mutex_t	cond_nb_comp;
 
-	uint64_t	time_last_compile;
-	uint64_t	deadline;
+	uint64_t		time_last_compile;
+	uint64_t		deadline;
 
-	t_dongle	*left_dongle;
-	t_dongle	*right_dongle;
+	t_dongle		*left_dongle;
+	t_dongle		*right_dongle;
 
-	t_sim		*sim;
+	t_sim			*sim;
 }	t_coder;
 
 /* **** Init tracking (true = successfully initialized, needs cleanup) */
@@ -116,12 +118,14 @@ typedef struct s_inited
 typedef struct s_sim
 {
 	bool			stop_sim;
+	int				coders_finish;
 	t_inited		inited;
 
 	pthread_t		monitor;
 
 	pthread_mutex_t	log_mutex;
 	pthread_mutex_t	sim_mutex;
+	pthread_mutex_t	coder_finish_mutex;
 
 	t_coder			*tab_coders;
 	t_dongle		*tab_dongles;
@@ -169,6 +173,17 @@ bool		parser(char **av, t_sim *sim);
 /* ****	Log *****/
 
 void		log_message(t_coder *coder, char *mes);
+
+/* **** SetGet **/
+
+bool		get_stop_sim(t_sim *sim);
+void		set_stop_sim(t_sim *sim, bool value);
+int			get_coders_finish(t_sim *sim);
+void		set_coders_finish(t_sim *sim, int value);
+int			get_nb_compile(t_coder *coder);
+void		set_nb_compile(t_coder *coder, int value);
+uint64_t	get_deadline(t_coder *coder);
+void		set_deadline(t_coder *coder, uint64_t value);
 
 /* ****	Sim *****/
 

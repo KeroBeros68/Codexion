@@ -6,26 +6,11 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 18:09:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 19:29:42 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 21:35:38 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
-
-/*
-** set_stop_sim
-** Thread-safe write of the simulation stop flag.
-** Acquires sim_mutex before setting stop_sim to true, ensuring that
-** no other thread reads a partially written value.
-**
-** @param sim  Pointer to the simulation structure.
-*/
-static void	set_stop_sim(t_sim *sim)
-{
-	pthread_mutex_lock(&sim->sim_mutex);
-	sim->stop_sim = true;
-	pthread_mutex_unlock(&sim->sim_mutex);
-}
 
 /*
 ** check_coders
@@ -41,40 +26,26 @@ static void	set_stop_sim(t_sim *sim)
 */
 static bool	check_coders(t_sim *sim, uint64_t current_ms)
 {
-	int	i;
+	int			i;
+	int			nb_compile;
+	int			finished;
+	uint64_t	deadline;
 
 	i = 0;
 	while (i < sim->nb_coders)
 	{
-		if (current_ms > sim->tab_coders[i].deadline
-			&& sim->tab_coders[i].nb_compile != sim->total_compile)
+		nb_compile = get_nb_compile(&sim->tab_coders[i]);
+		deadline = get_deadline(&sim->tab_coders[i]);
+		if (current_ms > deadline && nb_compile != sim->total_compile)
 		{
 			log_message(&sim->tab_coders[i], "burned out");
 			return (true);
 		}
 		i++;
 	}
-	return (false);
-}
-
-/*
-** stop_sim
-** Thread-safe read of the simulation stop flag.
-** Acquires sim_mutex before reading stop_sim to prevent data races
-** with the thread that may set it concurrently.
-**
-** @param sim  Pointer to the simulation structure.
-** @return     true if the simulation has been flagged to stop, false otherwise.
-*/
-bool	stop_sim(t_sim *sim)
-{
-	pthread_mutex_lock(&sim->sim_mutex);
-	if (sim->stop_sim)
-	{
-		pthread_mutex_unlock(&sim->sim_mutex);
+	finished = get_coders_finish(sim);
+	if (sim->nb_coders == finished)
 		return (true);
-	}
-	pthread_mutex_unlock(&sim->sim_mutex);
 	return (false);
 }
 
@@ -102,13 +73,13 @@ void	*monitoring(void *arg)
 	while (1)
 	{
 		usleep(100);
-		if (stop_sim(sim))
+		if (get_stop_sim(sim))
 			return (NULL);
 
 		current_ms = get_timestamp();
 		if (check_coders(sim, current_ms))
 		{
-			set_stop_sim(sim);
+			set_stop_sim(sim, true);
 			return (NULL);
 		}
 	}
