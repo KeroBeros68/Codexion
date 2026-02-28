@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 19:35:12 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 22:10:22 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 22:18:14 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,13 @@ static void	take_dongle(t_coder *coder, t_dongle *dongle, uint64_t key)
 	pthread_mutex_unlock(&dongle->lock);
 }
 
+uint64_t	scheduler(t_coder *coder)
+{
+	if (coder->sim->priority)
+		return (coder->compile_start + coder->sim->time_burnout);
+	return (get_timestamp());
+}
+
 void	release_dongle(t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->lock);
@@ -39,7 +46,7 @@ bool	acquire_dongles(t_coder *coder)
 {
 	uint64_t	key;
 
-	key = get_timestamp();
+	key = scheduler(coder);
 	take_dongle(coder, coder->left_dongle, key);
 	take_dongle(coder, coder->right_dongle, key);
 	return (false);

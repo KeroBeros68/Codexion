@@ -161,13 +161,13 @@ push_chore:
 re: fclean all
 
 run:
-	./codexion 10 2000 200 100 200 10 400 fifo
+	./codexion 10 2000 200 100 200 10 400 $(T)
 
 run_hell:
-	valgrind --tool=helgrind ./codexion 10 2000 200 100 200 10 400 fifo
+	valgrind --tool=helgrind ./codexion 10 2000 200 100 200 10 400 $(T)
 
 run_leak:
-	valgrind --leak-check=full ./codexion 10 2000 200 100 200 10 400 fifo
+	valgrind --leak-check=full ./codexion 10 2000 200 100 200 10 400 $(T)
 
 .PHONY: clean fclean re bonus \
 		 push_chore push_doc \
