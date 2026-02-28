@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 23:36:40 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:44:32 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,15 @@ than 0\n"
 # define ERR_MALLOC_DONGLES		"Memory allocation failed for dongles table\n"
 # define ERR_MUTEX_INIT			"Failed to initialize mutex\n"
 # define ERR_COND_INIT			"Failed to initialize condition variable\n"
+
+/* **** Colored log messages for simulation events */
 # define LOG_TAKEN				"\033[1;34mhas taken a dongle\033[0m"
 # define LOG_COMPILING			"\033[1;32mis compiling\033[0m"
 # define LOG_DEBUGGING			"\033[1;33mis debugging\033[0m"
 # define LOG_REFACTORING		"\033[1;33mis refactoring\033[0m"
 # define LOG_BURNED_OUT			"\033[1;31mburned out\033[0m"
+
+/* **** End-of-simulation ASCII art banner */
 # define END_BANNER \
 "\n  /$$$$$$  /$$                         /$$             /$$     /$$" \
 "                           /$$$$$$$$                 /$$\n" \
@@ -215,6 +219,7 @@ void		simulation(t_sim *sim);
 
 bool		acquire_dongles(t_coder *coder);
 void		release_dongle(t_coder *coder, t_dongle *dongle);
+void		wake_all_dongles(t_sim *sim);
 
 /* ****	Heap ****/
 

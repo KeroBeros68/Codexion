@@ -78,6 +78,7 @@ void	*monitoring(void *arg)
 		if (check_coders(sim, current_ms))
 		{
 			set_stop_sim(sim, true);
+			wake_all_dongles(sim);
 			return (NULL);
 		}
 	}

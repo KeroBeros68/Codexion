@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 19:35:12 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 22:43:58 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:42:42 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ static void	take_dongle(t_coder *coder, t_dongle *dongle, uint64_t key)
 			pthread_cond_wait(&dongle->cond, &dongle->lock);
 	}
 	heap_pop(&dongle->waitlist);
-	log_message(coder, LOG_TAKEN);
 	pthread_mutex_unlock(&dongle->lock);
 }
 
@@ -92,20 +91,57 @@ void	release_dongle(t_coder *coder, t_dongle *dongle)
 }
 
 /*
+** wake_all_dongles
+** Broadcasts on every dongle's condition variable so that threads blocked
+** inside take_dongle (on cond_wait or cond_timedwait) wake up immediately,
+** re-check stop_sim and exit without waiting for the next natural wakeup.
+** Called by the monitor thread right after setting stop_sim to true.
+**
+** @param sim  Pointer to the simulation structure.
+*/
+void	wake_all_dongles(t_sim *sim)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->nb_coders)
+	{
+		pthread_mutex_lock(&sim->tab_dongles[i].lock);
+		pthread_cond_broadcast(&sim->tab_dongles[i].cond);
+		pthread_mutex_unlock(&sim->tab_dongles[i].lock);
+		i++;
+	}
+}
+
+/*
 ** acquire_dongles
 ** Acquires both dongles required for a compile cycle.
-** Computes a single scheduler key then calls take_dongle for left then
-** right. Using the same key for both ensures consistent priority ordering.
+** Computes a single scheduler key, then interleaves stop_sim checks with
+** the two takes: checks stop_sim → takes left dongle → checks stop_sim →
+** logs LOG_TAKEN (blue) → checks stop_sim → takes right dongle →
+** checks stop_sim → logs LOG_TAKEN (blue).
+** Using the same key for both ensures consistent priority ordering across
+** FIFO and EDF schedulers.
 **
 ** @param coder  Pointer to the coder requesting both dongles.
-** @return       Always false (reserved for future error propagation).
+** @return       true on success, false if stop_sim is set at any check point.
 */
 bool	acquire_dongles(t_coder *coder)
 {
 	uint64_t	key;
 
 	key = scheduler(coder);
+	if (get_stop_sim(coder->sim))
+		return (false);
 	take_dongle(coder, coder->left_dongle, key);
+	if (get_stop_sim(coder->sim))
+		return (false);
+	log_message(coder, LOG_TAKEN);
+	if (get_stop_sim(coder->sim))
+		return (false);
 	take_dongle(coder, coder->right_dongle, key);
-	return (false);
+	if (get_stop_sim(coder->sim))
+		return (false);
+	log_message(coder, LOG_TAKEN);
+	return (true);
 }

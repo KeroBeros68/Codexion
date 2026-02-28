@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/28 23:00:36 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 23:05:07 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:44:30 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ** compile
 ** Runs one compilation cycle for a coder.
 ** Checks stop_sim, acquires both dongles, records compile_start, updates
-** deadline, logs "is compiling", sleeps time_compile, releases both dongles.
+** deadline, logs LOG_COMPILING (green), sleeps time_compile, releases both dongles.
 ** Returns false immediately if stop_sim is set before or after acquisition.
 **
 ** @param self  Pointer to the coder executing the compile phase.
@@ -26,7 +26,8 @@ bool	compile(t_coder *self)
 {
 	if (get_stop_sim(self->sim))
 		return (false);
-	acquire_dongles(self);
+	if (!acquire_dongles(self))
+		return (false);
 	if (get_stop_sim(self->sim))
 		return (false);
 	self->compile_start = get_timestamp();
@@ -41,7 +42,7 @@ bool	compile(t_coder *self)
 /*
 ** debug
 ** Runs the debug phase for a coder.
-** Checks stop_sim, logs "is debugging", sleeps for time_debug.
+** Checks stop_sim, logs LOG_DEBUGGING (yellow), sleeps for time_debug.
 **
 ** @param self  Pointer to the coder executing the debug phase.
 ** @return      true on success, false if stop_sim was set.
@@ -58,7 +59,7 @@ bool	debug(t_coder *self)
 /*
 ** refacto
 ** Runs the refactoring phase for a coder.
-** Checks stop_sim, logs "is refactoring", sleeps for time_refactor.
+** Checks stop_sim, logs LOG_REFACTORING (yellow), sleeps for time_refactor.
 **
 ** @param self  Pointer to the coder executing the refacto phase.
 ** @return      true on success, false if stop_sim was set.
