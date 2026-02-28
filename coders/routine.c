@@ -31,7 +31,7 @@ bool	compile(t_coder *self)
 		return (false);
 	self->compile_start = get_timestamp();
 	set_deadline(self, get_timestamp() + self->sim->time_burnout);
-	log_message(self, "is compiling");
+	log_message(self, LOG_COMPILING);
 	mysleep(self->sim->time_compile);
 	release_dongle(self, self->right_dongle);
 	release_dongle(self, self->left_dongle);
@@ -50,7 +50,7 @@ bool	debug(t_coder *self)
 {
 	if (get_stop_sim(self->sim))
 		return (false);
-	log_message(self, "is debugging");
+	log_message(self, LOG_DEBUGGING);
 	mysleep(self->sim->time_debug);
 	return (true);
 }
@@ -67,7 +67,7 @@ bool	refacto(t_coder *self)
 {
 	if (get_stop_sim(self->sim))
 		return (false);
-	log_message(self, "is refactoring");
+	log_message(self, LOG_REFACTORING);
 	mysleep(self->sim->time_refactor);
 	return (true);
 }

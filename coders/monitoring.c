@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 18:09:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 23:05:21 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:31:03 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static bool	check_coders(t_sim *sim, uint64_t current_ms)
 		deadline = get_deadline(&sim->tab_coders[i]);
 		if (current_ms > deadline && nb_compile != sim->total_compile)
 		{
-			log_message(&sim->tab_coders[i], "burned out");
+			log_message(&sim->tab_coders[i], LOG_BURNED_OUT);
 			return (true);
 		}
 		i++;

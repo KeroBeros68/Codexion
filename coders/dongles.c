@@ -50,7 +50,7 @@ static void	take_dongle(t_coder *coder, t_dongle *dongle, uint64_t key)
 			pthread_cond_wait(&dongle->cond, &dongle->lock);
 	}
 	heap_pop(&dongle->waitlist);
-	log_message(coder, "has taken a dongle");
+	log_message(coder, LOG_TAKEN);
 	pthread_mutex_unlock(&dongle->lock);
 }
 
