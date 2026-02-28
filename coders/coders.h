@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/27 19:58:18 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/27 21:38:52 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,12 @@ void		simulation(t_sim *sim);
 
 bool		acquire_dongles(t_coder *coder);
 void		release_dongle(t_coder *coder, t_dongle *dongle);
+
+/* ****	Heap ****/
+
+void		heap_push(t_heap *heap, t_heap_node node);
+t_heap_node	heap_pop(t_heap *heap);
+t_heap_node	heap_peek(t_heap *heap);
 
 /* ****	Error ***/
 

@@ -30,6 +30,7 @@ bool	init_dongles(t_sim *sim)
 	while (i < sim->nb_coders)
 	{
 		sim->tab_dongles[i].id = i + 1;
+		sim->tab_dongles[i].waitlist.capacity = 2;
 		if (pthread_mutex_init(&sim->tab_dongles[i].lock, NULL) != 0)
 			return (cod_error(sim, ERR_MUTEX_INIT));
 		sim->inited.dongle_mutex++;
