@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 21:58:26 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 21:59:55 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ typedef struct s_coder
 	pthread_mutex_t	cond_dead;
 	pthread_mutex_t	cond_nb_comp;
 
-	uint64_t		time_last_compile;
+	uint64_t		compile_start;
 	uint64_t		deadline;
 
 	t_dongle		*left_dongle;
