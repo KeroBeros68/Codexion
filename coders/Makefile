@@ -171,7 +171,7 @@ run_leak:
 
 .PHONY: clean fclean re bonus \
 		 push_chore push_doc \
-		 push_facto push_feat \
+		 push_factor push_feat \
 		 push_fix push_style \
 		 run_hell run_leak \
 		 add st
