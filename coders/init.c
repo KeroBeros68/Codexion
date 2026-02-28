@@ -15,9 +15,9 @@
 /*
 ** init_dongles
 ** Initializes all dongle entries in sim->tab_dongles.
-** For each dongle, assigns a 1-based id, initializes its mutex and condition
-** variable, and increments the corresponding inited counters so that clean()
-** knows exactly how many resources must be destroyed on error.
+** For each dongle, sets waitlist capacity to 2, initializes its mutex and
+** condition variable, and increments the corresponding inited counters so
+** that clean() destroys only what was successfully initialized.
 **
 ** @param sim  Pointer to the simulation structure.
 ** @return     true on success, false if any mutex or cond init fails.
@@ -44,11 +44,13 @@ bool	init_dongles(t_sim *sim)
 /*
 ** init_coders
 ** Initializes all coder entries in sim->tab_coders.
-** For each coder, assigns a 1-based id, binds left and right dongles in a
-** circular layout (coder i holds dongle i and dongle i+1, with the last
-** coder wrapping back to dongle 0), and stores a back-pointer to sim.
+** Assigns a 1-based id, sets deadline to UINT64_MAX, binds left and right
+** dongles in circular layout (coder i: left=dongle i, right=dongle i+1,
+** last coder wraps to dongle 0), stores a sim back-pointer, and inits
+** per-coder mutexes cond_dead and cond_nb_comp.
 **
 ** @param sim  Pointer to the simulation structure.
+** @return     true on success, false if any mutex init fails.
 */
 bool	init_coders(t_sim *sim)
 {
@@ -78,10 +80,10 @@ bool	init_coders(t_sim *sim)
 ** init
 ** Allocates and initializes all simulation resources.
 ** Allocates coders and dongles tables with ft_calloc (zero-initialized),
-** initializes the global log and sim mutexes, then delegates per-dongle
-** and per-coder initialization to init_dongles() and init_coders().
-** On any failure, returns false immediately; clean() uses the inited
-** counters to destroy only what was successfully initialized.
+** initializes coder_finish_mutex, log_mutex and sim_mutex (each tracked
+** in sim->inited), then delegates to init_dongles() and init_coders().
+** On any failure returns false immediately; clean() uses the inited flags
+** and counters to destroy only what was successfully initialized.
 **
 ** @param sim  Pointer to the simulation structure to initialize.
 ** @return     true on success, false on any allocation or init failure.
@@ -96,6 +98,7 @@ bool	init(t_sim *sim)
 		return (cod_error(ERR_MALLOC_DONGLES));
 	if (pthread_mutex_init(&sim->coder_finish_mutex, NULL) != 0)
 		return (cod_error(ERR_MUTEX_INIT));
+	sim->inited.coder_finish_mutex = true;
 	if (pthread_mutex_init(&sim->log_mutex, NULL) != 0)
 		return (cod_error(ERR_MUTEX_INIT));
 	sim->inited.log_mutex = true;

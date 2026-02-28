@@ -44,7 +44,6 @@ static bool	schedule_validation(char *value, t_sim *sim)
 ** @param dest  Pointer to the field to write (uint64_t * or int *).
 ** @param s     Raw string from argv to validate and convert.
 ** @param size  sizeof the target type, used to select the conversion path.
-** @param sim   Pointer to the simulation structure, used for error reporting.
 ** @return      true on success, false on invalid input or overflow.
 */
 static bool	number_validation(void *dest, char *s, size_t size)

@@ -106,6 +106,7 @@ typedef struct s_inited
 {
 	bool	log_mutex;
 	bool	sim_mutex;
+	bool	coder_finish_mutex;
 	int		dongle_mutex;
 	int		dongle_cond;
 

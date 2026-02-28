@@ -12,6 +12,14 @@
 
 #include "coders.h"
 
+/*
+** cod_error
+** Prints an error message to stderr and returns false.
+** Designed for use in return statements: return (cod_error(MSG)).
+**
+** @param msg  Null-terminated error string (prefixed with "ERROR: ").
+** @return     Always false.
+*/
 bool	cod_error(char *msg)
 {
 	fprintf(stderr, "ERROR: %s", msg);

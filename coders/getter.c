@@ -13,7 +13,7 @@
 #include "coders.h"
 
 /*
-** stop_sim
+** get_stop_sim
 ** Thread-safe read of the simulation stop flag.
 ** Acquires sim_mutex before reading stop_sim to prevent data races
 ** with the thread that may set it concurrently.
@@ -33,6 +33,14 @@ bool	get_stop_sim(t_sim *sim)
 	return (false);
 }
 
+/*
+** get_coders_finish
+** Thread-safe read of the number of coders that have completed all their
+** required compilations. Protected by coder_finish_mutex.
+**
+** @param sim  Pointer to the simulation structure.
+** @return     Current value of coders_finish.
+*/
 int	get_coders_finish(t_sim *sim)
 {
 	int	value;
@@ -43,6 +51,14 @@ int	get_coders_finish(t_sim *sim)
 	return (value);
 }
 
+/*
+** get_nb_compile
+** Thread-safe read of the compilation counter for a single coder.
+** Protected by cond_nb_comp.
+**
+** @param coder  Pointer to the coder.
+** @return       Number of compilations completed so far.
+*/
 int	get_nb_compile(t_coder *coder)
 {
 	int	value;
@@ -53,6 +69,15 @@ int	get_nb_compile(t_coder *coder)
 	return (value);
 }
 
+/*
+** get_deadline
+** Thread-safe read of the burnout deadline for a single coder.
+** Protected by cond_dead. The deadline equals compile_start +
+** time_burnout, updated at the start of each compile cycle.
+**
+** @param coder  Pointer to the coder.
+** @return       Deadline timestamp in milliseconds.
+*/
 uint64_t	get_deadline(t_coder *coder)
 {
 	uint64_t	value;

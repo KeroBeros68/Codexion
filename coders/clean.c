@@ -12,6 +12,14 @@
 
 #include "coders.h"
 
+/*
+** join_coders
+** Joins every coder thread then destroys its per-coder mutexes.
+** pthread_join is called before destroy to ensure the thread has fully
+** exited and will no longer access cond_dead or cond_nb_comp.
+**
+** @param sim  Pointer to the simulation structure.
+*/
 void	join_coders(t_sim *sim)
 {
 	int	i;
@@ -26,6 +34,17 @@ void	join_coders(t_sim *sim)
 	}
 }
 
+/*
+** clean
+** Joins all threads and releases all simulation resources in safe order.
+** Order: join monitor -> join_coders (join + destroy per-coder mutexes) ->
+** free coders -> destroy dongle conds -> destroy dongle mutexes -> free
+** dongles -> destroy global mutexes guarded by inited flags (log_mutex,
+** sim_mutex, coder_finish_mutex). Monitor is joined first so it cannot
+** access coder mutexes after they are destroyed.
+**
+** @param sim  Pointer to the simulation structure to clean up.
+*/
 void	clean(t_sim *sim)
 {
 	int	i;
@@ -46,5 +65,6 @@ void	clean(t_sim *sim)
 		pthread_mutex_destroy(&sim->log_mutex);
 	if (sim->inited.sim_mutex)
 		pthread_mutex_destroy(&sim->sim_mutex);
-	pthread_mutex_destroy(&sim->coder_finish_mutex);
+	if (sim->inited.coder_finish_mutex)
+		pthread_mutex_destroy(&sim->coder_finish_mutex);
 }

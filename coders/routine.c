@@ -12,6 +12,16 @@
 
 #include "coders.h"
 
+/*
+** compile
+** Runs one compilation cycle for a coder.
+** Checks stop_sim, acquires both dongles, records compile_start, updates
+** deadline, logs "is compiling", sleeps time_compile, releases both dongles.
+** Returns false immediately if stop_sim is set before or after acquisition.
+**
+** @param self  Pointer to the coder executing the compile phase.
+** @return      true on success, false if stop_sim was set.
+*/
 bool	compile(t_coder *self)
 {
 	if (get_stop_sim(self->sim))
@@ -28,6 +38,14 @@ bool	compile(t_coder *self)
 	return (true);
 }
 
+/*
+** debug
+** Runs the debug phase for a coder.
+** Checks stop_sim, logs "is debugging", sleeps for time_debug.
+**
+** @param self  Pointer to the coder executing the debug phase.
+** @return      true on success, false if stop_sim was set.
+*/
 bool	debug(t_coder *self)
 {
 	if (get_stop_sim(self->sim))
@@ -37,6 +55,14 @@ bool	debug(t_coder *self)
 	return (true);
 }
 
+/*
+** refacto
+** Runs the refactoring phase for a coder.
+** Checks stop_sim, logs "is refactoring", sleeps for time_refactor.
+**
+** @param self  Pointer to the coder executing the refacto phase.
+** @return      true on success, false if stop_sim was set.
+*/
 bool	refacto(t_coder *self)
 {
 	if (get_stop_sim(self->sim))
@@ -46,6 +72,17 @@ bool	refacto(t_coder *self)
 	return (true);
 }
 
+/*
+** coder_routine
+** Entry point for each coder thread.
+** Sets initial deadline, then loops compile -> debug -> refacto until
+** total_compile is reached or stop_sim is set. Each sub-phase returns
+** false if stopped mid-cycle, causing immediate thread exit.
+** On normal completion increments coders_finish and returns NULL.
+**
+** @param arg  Pointer to the coder's t_coder struct, cast as void *.
+** @return     Always NULL.
+*/
 void	*coder_routine(void *arg)
 {
 	t_coder	*self;
