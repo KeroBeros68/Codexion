@@ -6,12 +6,11 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 16:13:12 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 21:26:12 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:06:20 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
-
 
 void	join_coders(t_sim *sim)
 {
@@ -33,29 +32,19 @@ void	clean(t_sim *sim)
 
 	pthread_join(sim->monitor, NULL);
 	join_coders(sim);
-
 	if (sim->tab_coders)
 		free(sim->tab_coders);
-
 	i = 0;
 	while (i < sim->inited.dongle_cond)
-	{
-		pthread_cond_destroy(&sim->tab_dongles[i].cond);
-		i++;
-	}
+		pthread_cond_destroy(&sim->tab_dongles[i++].cond);
 	i = 0;
 	while (i < sim->inited.dongle_mutex)
-	{
-		pthread_mutex_destroy(&sim->tab_dongles[i].lock);
-		i++;
-	}
+		pthread_mutex_destroy(&sim->tab_dongles[i++].lock);
 	if (sim->tab_dongles)
 		free(sim->tab_dongles);
-
 	if (sim->inited.log_mutex)
 		pthread_mutex_destroy(&sim->log_mutex);
 	if (sim->inited.sim_mutex)
 		pthread_mutex_destroy(&sim->sim_mutex);
-
 	pthread_mutex_destroy(&sim->coder_finish_mutex);
 }

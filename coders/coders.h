@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 22:47:45 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:04:19 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,6 +184,7 @@ void		set_deadline(t_coder *coder, uint64_t value);
 
 /* ****	Sim *****/
 
+void		*coder_routine(void *arg);
 void		*monitoring(void *arg);
 void		simulation(t_sim *sim);
 

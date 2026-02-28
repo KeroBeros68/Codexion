@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 17:32:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 21:25:43 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:06:06 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,13 +59,11 @@ bool	init_coders(t_sim *sim)
 	{
 		sim->tab_coders[i].id = i + 1;
 		sim->tab_coders[i].deadline = UINT64_MAX;
-
 		sim->tab_coders[i].left_dongle = &sim->tab_dongles[i];
 		if (i == sim->nb_coders - 1)
 			sim->tab_coders[i].right_dongle = &sim->tab_dongles[0];
 		else
 			sim->tab_coders[i].right_dongle = &sim->tab_dongles[i + 1];
-
 		sim->tab_coders[i].sim = sim;
 		if (pthread_mutex_init(&sim->tab_coders[i].cond_dead, NULL) != 0)
 			return (cod_error(ERR_MUTEX_INIT));
@@ -96,7 +94,6 @@ bool	init(t_sim *sim)
 	sim->tab_dongles = ft_calloc(sim->nb_coders, sizeof(t_dongle));
 	if (!sim->tab_dongles)
 		return (cod_error(ERR_MALLOC_DONGLES));
-
 	if (pthread_mutex_init(&sim->coder_finish_mutex, NULL) != 0)
 		return (cod_error(ERR_MUTEX_INIT));
 	if (pthread_mutex_init(&sim->log_mutex, NULL) != 0)
@@ -105,7 +102,6 @@ bool	init(t_sim *sim)
 	if (pthread_mutex_init(&sim->sim_mutex, NULL) != 0)
 		return (cod_error(ERR_MUTEX_INIT));
 	sim->inited.sim_mutex = true;
-
 	if (!init_dongles(sim))
 		return (false);
 	if (!init_coders(sim))

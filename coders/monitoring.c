@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 18:09:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 21:35:38 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 23:05:21 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,13 +69,11 @@ void	*monitoring(void *arg)
 	uint64_t		current_ms;
 
 	sim = (t_sim *)arg;
-
 	while (1)
 	{
 		usleep(100);
 		if (get_stop_sim(sim))
 			return (NULL);
-
 		current_ms = get_timestamp();
 		if (check_coders(sim, current_ms))
 		{
