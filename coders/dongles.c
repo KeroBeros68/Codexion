@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 19:35:12 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 21:09:59 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/02/28 22:10:22 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ static void	take_dongle(t_coder *coder, t_dongle *dongle, uint64_t key)
 
 void	release_dongle(t_coder *coder, t_dongle *dongle)
 {
+	pthread_mutex_lock(&dongle->lock);
 	dongle->time_end_cooldown = get_timestamp() + coder->sim->time_cooldown;
+	pthread_mutex_unlock(&dongle->lock);
 	pthread_cond_broadcast(&dongle->cond);
 }
 
