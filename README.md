@@ -101,14 +101,16 @@ timestamp_ms  coder_id  event
 Example output:
 
 ```
-0     1  is refactoring
-0     2  is refactoring
-201   1  has taken a dongle
-201   2  has taken a dongle
-201   1  is compiling
-201   2  is compiling
-402   1  is debugging
-402   2  is debugging
+0     1  has taken a dongle
+1     1  has taken a dongle
+1     1  is compiling
+401   1  is debugging
+501   1  is refactoring
+701   2  has taken a dongle
+701   2  has taken a dongle
+701   2  is compiling
+1101  2  is debugging
+1201  2  is refactoring
 ```
 
 Events (color-coded in terminal):
@@ -183,7 +185,16 @@ All output is protected by a single `log_mutex`. Every call to `log_message` acq
 ## ⚠️ Edge cases
 
 ### 🔥 Coder burnout under tight timing
-If `time_to_burnout` is barely larger than `time_to_compile * 2 + dongle_cooldown`, a coder may burn out under adverse OS scheduling even though the parameters are theoretically safe. This is an inherent limitation of user-space real-time simulation.
+If the parameters do not satisfy the liveness condition below, a coder **will always burn out** — it is not a bug but infeasible parameters:
+
+```
+time_to_burnout > time_to_compile + dongle_cooldown + time_to_debug + time_to_refactor
+```
+
+Example: `./codexion 3 800 400 100 100 5 300 fifo` → burnout guaranteed (800 < 900).
+
+### 🧍 N = 1 — single coder
+With only one coder, `left_dongle == right_dongle`. Acquiring both would deadlock on the same mutex. This is handled explicitly in `acquire_dongles`: if `nb_coders == 1`, the coder spins on `stop_sim` until the monitor detects the burnout, then exits. The single coder **always burns out**.
 
 ### 🤝 EDF ties — identical deadlines at startup
 When all coders start simultaneously, their initial deadlines are identical. EDF falls back to heap insertion order (which reflects `coder_id`) to break ties, so coder 1 is served first. This is deterministic for the very first round but may produce uneven first-round latencies.
@@ -201,11 +212,12 @@ If two coders reach exactly the same deadline value (e.g., after synchronized co
 
 | Edge case | Scheduler | Observable effect | Mitigation |
 |---|---|---|---|
-| Tight timing burnout | both | Burnout despite valid params | Increase `time_to_burnout` margin |
-| Identical initial deadlines | EDF | Coder 1 always first in round 1 | Expected; averages out |
-| OS jitter | both | Spurious burnout under load | Use large `time_to_burnout` |
+| Infeasible params (burnout > compile+cooldown+debug+refacto) | both | Guaranteed burnout | Respect liveness formula |
+| N=1 single coder | both | Always burns out | Handled: spins until monitor fires |
+| Identical initial deadlines | EDF | Coder 1 always first in round 1 | Expected; stabilises after round 1 |
+| OS jitter | both | Spurious burnout under load | Use large `time_to_burnout` margin |
 | Release order throughput skew | both | One coder compiles more per cycle | Averages out over time |
-| Strict-tie non-determinism | EDF | Different ordering across runs | No fix needed; non-critical |
+| Strict-tie non-determinism | EDF | Different ordering across runs | Non-critical; heap insertion order |
 
 ---
 
@@ -216,11 +228,11 @@ If two coders reach exactly the same deadline value (e.g., after synchronized co
 | Mutex | Protects |
 |---|---|
 | `sim.log_mutex` | All `printf` output — prevents line interleaving |
-| `sim.stop_mutex` | `sim.stop_sim` flag — read/written by monitor and coder threads |
-| `sim.coders_finish_mutex` | `sim.coders_finish` counter — incremented when a coder completes all compilations |
-| `coder.deadline_mutex` | `coder.deadline` — written by the coder, read by the monitor |
-| `coder.nb_compile_mutex` | `coder.nb_compile` — written by the coder, read by the monitor |
-| `dongle.lock` | `dongle.waitlist` (heap) and `dongle.time_end_cooldown` |
+| `sim.sim_mutex` | `sim.stop_sim` flag — read/written by monitor and coder threads |
+| `sim.coder_finish_mutex` | `sim.coders_finish` counter — incremented when a coder completes all compilations |
+| `coder.cond_dead` | `coder.deadline` — written by the coder, read by the monitor |
+| `coder.cond_nb_comp` | `coder.nb_compile` — written by the coder, read by the monitor |
+| `dongle.lock` | `dongle.waitlist` (heap), `dongle.in_use` and `dongle.time_end_cooldown` |
 
 Every shared field is accessed exclusively through its getter/setter pair, which wraps a `pthread_mutex_lock / pthread_mutex_unlock` around the read or write. This ensures no race condition can occur on any individual field.
 
@@ -232,14 +244,16 @@ Each dongle has its own condition variable (`dongle.cond`), paired with `dongle.
 ```c
 // Coder enqueues itself in the heap then waits until:
 // 1. It is at the head of the waitlist (its key is the smallest)
-// 2. The cooldown has expired
+// 2. The dongle is not currently in use
+// 3. The cooldown has expired
 while (heap_peek(...).coder_id != coder->id
+    || dongle->in_use
     || get_timestamp() < dongle->time_end_cooldown)
 {
-    if (cooldown_active)
-        pthread_cond_timedwait(&dongle->cond, &dongle->lock, &ts);
-    else
+    if (dongle->in_use || no cooldown active)
         pthread_cond_wait(&dongle->cond, &dongle->lock);
+    else
+        pthread_cond_timedwait(&dongle->cond, &dongle->lock, &ts);
 }
 ```
 
