@@ -116,10 +116,14 @@ void	wake_all_dongles(t_sim *sim)
 /*
 ** acquire_dongles
 ** Acquires both dongles required for a compile cycle.
-** Computes a single scheduler key, then interleaves stop_sim checks with
-** the two takes: checks stop_sim → takes left dongle → checks stop_sim →
-** logs LOG_TAKEN (blue) → checks stop_sim → takes right dongle →
-** checks stop_sim → logs LOG_TAKEN (blue).
+** If there is only one coder, left and right dongles are the same object:
+** compiling is impossible and the coder must burn out. In that case the
+** function spins on stop_sim (sleeping 100 µs per iteration) until the
+** monitor detects the burnout and sets stop_sim, then returns false.
+** Otherwise computes a single scheduler key, then interleaves stop_sim
+** checks with the two takes: checks stop_sim → takes left dongle →
+** checks stop_sim → logs LOG_TAKEN (blue) → checks stop_sim → takes
+** right dongle → checks stop_sim → logs LOG_TAKEN (blue).
 ** Using the same key for both ensures consistent priority ordering across
 ** FIFO and EDF schedulers.
 **
@@ -130,6 +134,12 @@ bool	acquire_dongles(t_coder *coder)
 {
 	uint64_t	key;
 
+	if (coder->sim->nb_coders == 1)
+	{
+		while (!get_stop_sim(coder->sim))
+			usleep(100);
+		return (false);
+	}
 	key = scheduler(coder);
 	if (get_stop_sim(coder->sim))
 		return (false);
