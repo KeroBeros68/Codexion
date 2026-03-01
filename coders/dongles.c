@@ -6,69 +6,80 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 19:35:12 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 23:42:42 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/03/01 14:34:11 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders.h"
 
 /*
-** take_dongle
-** Blocks until coder is granted exclusive access to dongle.
-** Pushes a scheduler node (coder_id, key) into the dongle waitlist heap,
-** then waits under dongle->lock until: the coder is at the head of the
-** waitlist (lowest key) AND the cooldown has expired. Uses timedwait when
-** a cooldown is active so the thread auto-wakes at the cooldown end time.
-** time_end_cooldown is read directly (not via getter) because the lock is
-** already held — calling the getter would deadlock.
+** wait_dongle
+** Blocks the calling coder under dongle->lock until all three conditions
+** are satisfied simultaneously:
+**   1. coder is at the head of dongle->waitlist (lowest scheduler key)
+**   2. dongle->in_use is false (no other coder currently holds it)
+**   3. dongle cooldown has expired (get_timestamp >= time_end_cooldown)
+** Uses timedwait when only the cooldown is pending (in_use == false) so
+** the thread auto-wakes at time_end_cooldown. Falls back to cond_wait
+** when in_use == true since only a broadcast from release_dongle can
+** unblock the waiting thread. Exits immediately if stop_sim is set.
+** Must be called with dongle->lock already held.
 **
-** @param coder   Pointer to the requesting coder.
-** @param dongle  Pointer to the target dongle.
-** @param key     Scheduler sort key (arrival time for FIFO, deadline for EDF).
+** @param coder   Pointer to the waiting coder.
+** @param dongle  Pointer to the dongle being waited on.
 */
-static void	take_dongle(t_coder *coder, t_dongle *dongle, uint64_t key)
+static void	wait_dongle(t_coder *coder, t_dongle *dongle)
 {
-	t_heap_node		node;
 	struct timespec	ts;
-	uint64_t		end_cd;
+	uint64_t		wake_at;
 
-	node.coder_id = coder->id;
-	node.key = key;
-	pthread_mutex_lock(&dongle->lock);
-	heap_push(&dongle->waitlist, node);
-	while (heap_peek(&dongle->waitlist).coder_id != coder->id
+	while (heap_peek(&dongle->waitlist).coder_id != coder->id || dongle->in_use
 		|| get_timestamp() < dongle->time_end_cooldown)
 	{
-		end_cd = dongle->time_end_cooldown;
-		if (get_timestamp() < end_cd)
+		if (get_stop_sim(coder->sim))
+			break ;
+		wake_at = dongle->time_end_cooldown;
+		if (!dongle->in_use && get_timestamp() < wake_at)
 		{
-			ts.tv_sec = end_cd / 1000;
-			ts.tv_nsec = (end_cd % 1000) * 1000000;
+			ts.tv_sec = wake_at / 1000;
+			ts.tv_nsec = (wake_at % 1000) * 1000000;
 			pthread_cond_timedwait(&dongle->cond, &dongle->lock, &ts);
 		}
 		else
 			pthread_cond_wait(&dongle->cond, &dongle->lock);
 	}
-	heap_pop(&dongle->waitlist);
-	pthread_mutex_unlock(&dongle->lock);
 }
 
 /*
-** scheduler
-** Returns the sort key used to order coder requests in the dongle waitlist.
-** FIFO (priority == 0): key = current timestamp at request time.
-** EDF  (priority == 1): key = compile_start + time_burnout (earliest deadline).
-** The same key is used for both left and right dongle acquisitions in a
-** single compile cycle to prevent priority inversion between the two takes.
+** take_dongle
+** Acquires exclusive access to a dongle for the requesting coder.
+** Pushes a scheduler node (coder_id, key) into the dongle waitlist heap,
+** then delegates to wait_dongle() which blocks under dongle->lock until:
+** the coder is at the head of the waitlist (lowest key), dongle->in_use
+** is false, AND the cooldown has expired. On success pops the node,
+** sets dongle->in_use = true and returns true. If stop_sim is raised
+** while waiting, unlocks and returns false without marking in_use.
 **
-** @param coder  Pointer to the requesting coder.
-** @return       Sort key as uint64_t milliseconds.
+** @param coder   Pointer to the requesting coder.
+** @param dongle  Pointer to the target dongle.
+** @param key     Scheduler sort key (arrival time for FIFO, deadline for EDF).
+** @return        true if dongle was acquired, false if stop_sim was set.
 */
-uint64_t	scheduler(t_coder *coder)
+static bool	take_dongle(t_coder *coder, t_dongle *dongle, uint64_t key)
 {
-	if (coder->sim->priority)
-		return (coder->compile_start + coder->sim->time_burnout);
-	return (get_timestamp());
+	t_heap_node		node;
+
+	node.coder_id = coder->id;
+	node.key = key;
+	pthread_mutex_lock(&dongle->lock);
+	heap_push(&dongle->waitlist, node);
+	wait_dongle(coder, dongle);
+	if (get_stop_sim(coder->sim))
+		return (pthread_mutex_unlock(&dongle->lock), false);
+	heap_pop(&dongle->waitlist);
+	dongle->in_use = true;
+	pthread_mutex_unlock(&dongle->lock);
+	return (true);
 }
 
 /*
@@ -85,6 +96,7 @@ uint64_t	scheduler(t_coder *coder)
 void	release_dongle(t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->lock);
+	dongle->in_use = false;
 	dongle->time_end_cooldown = get_timestamp() + coder->sim->time_cooldown;
 	pthread_cond_broadcast(&dongle->cond);
 	pthread_mutex_unlock(&dongle->lock);
@@ -116,19 +128,18 @@ void	wake_all_dongles(t_sim *sim)
 /*
 ** acquire_dongles
 ** Acquires both dongles required for a compile cycle.
-** If there is only one coder, left and right dongles are the same object:
-** compiling is impossible and the coder must burn out. In that case the
-** function spins on stop_sim (sleeping 100 µs per iteration) until the
-** monitor detects the burnout and sets stop_sim, then returns false.
-** Otherwise computes a single scheduler key, then interleaves stop_sim
-** checks with the two takes: checks stop_sim → takes left dongle →
-** checks stop_sim → logs LOG_TAKEN (blue) → checks stop_sim → takes
-** right dongle → checks stop_sim → logs LOG_TAKEN (blue).
-** Using the same key for both ensures consistent priority ordering across
-** FIFO and EDF schedulers.
+** If nb_coders == 1, left and right point to the same dongle: compiling
+** is impossible so the function spins on stop_sim (100 µs sleep) until
+** the monitor fires the burnout, then returns false.
+** Otherwise: computes a single scheduler key, checks stop_sim, takes
+** left dongle (logs LOG_TAKEN on success), then takes right dongle (logs
+** LOG_TAKEN on success). If either take fails (stop_sim set), any already
+** acquired dongle is released before returning false.
+** Using one key for both takes ensures consistent priority ordering
+** across FIFO and EDF schedulers.
 **
 ** @param coder  Pointer to the coder requesting both dongles.
-** @return       true on success, false if stop_sim is set at any check point.
+** @return       true if both dongles acquired, false if stop_sim was set.
 */
 bool	acquire_dongles(t_coder *coder)
 {
@@ -143,15 +154,17 @@ bool	acquire_dongles(t_coder *coder)
 	key = scheduler(coder);
 	if (get_stop_sim(coder->sim))
 		return (false);
-	take_dongle(coder, coder->left_dongle, key);
-	if (get_stop_sim(coder->sim))
+	if (!take_dongle(coder, coder->left_dongle, key))
 		return (false);
 	log_message(coder, LOG_TAKEN);
-	if (get_stop_sim(coder->sim))
-		return (false);
-	take_dongle(coder, coder->right_dongle, key);
-	if (get_stop_sim(coder->sim))
-		return (false);
+	if (!take_dongle(coder, coder->right_dongle, key))
+		return (release_dongle(coder, coder->left_dongle), false);
 	log_message(coder, LOG_TAKEN);
+	if (get_stop_sim(coder->sim))
+	{
+		release_dongle(coder, coder->right_dongle);
+		release_dongle(coder, coder->left_dongle);
+		return (false);
+	}
 	return (true);
 }

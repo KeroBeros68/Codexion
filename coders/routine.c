@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/28 23:00:36 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 23:44:30 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/03/01 14:32:06 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 ** compile
 ** Runs one compilation cycle for a coder.
 ** Checks stop_sim, acquires both dongles, records compile_start, updates
-** deadline, logs LOG_COMPILING (green), sleeps time_compile, releases both dongles.
+** deadline, logs LOG_COMPILING (green), sleeps time_compile,
+** 		releases both dongles.
 ** Returns false immediately if stop_sim is set before or after acquisition.
 **
 ** @param self  Pointer to the coder executing the compile phase.

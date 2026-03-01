@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 17:32:22 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 23:06:06 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/03/01 14:22:54 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,36 @@ bool	init_dongles(t_sim *sim)
 }
 
 /*
+** left_right_handed
+** Swaps left and right dongle pointers for odd-numbered coders.
+** This prevents the classical circular-wait deadlock: odd coders acquire
+** right before left, while even coders acquire left before right,
+** breaking the symmetry that would let every coder hold one dongle
+** and wait forever for the other.
+**
+** @param self  Pointer to the coder whose dongle pointers may be swapped.
+*/
+static void	left_right_handed(t_coder *self)
+{
+	t_dongle	*tmp;
+
+	if (self->id % 2 == 1)
+	{
+		tmp = self->right_dongle;
+		self->right_dongle = self->left_dongle;
+		self->left_dongle = tmp;
+	}
+}
+
+/*
 ** init_coders
 ** Initializes all coder entries in sim->tab_coders.
 ** Assigns a 1-based id, sets deadline to UINT64_MAX, binds left and right
 ** dongles in circular layout (coder i: left=dongle i, right=dongle i+1,
-** last coder wraps to dongle 0), stores a sim back-pointer, and inits
-** per-coder mutexes cond_dead and cond_nb_comp.
+** last coder wraps to dongle 0), stores a sim back-pointer, inits
+** per-coder mutexes cond_dead and cond_nb_comp, and calls
+** left_right_handed() to swap left/right for odd coders, breaking the
+** circular-wait symmetry.
 **
 ** @param sim  Pointer to the simulation structure.
 ** @return     true on success, false if any mutex init fails.
@@ -71,6 +95,7 @@ bool	init_coders(t_sim *sim)
 			return (cod_error(ERR_MUTEX_INIT));
 		if (pthread_mutex_init(&sim->tab_coders[i].cond_nb_comp, NULL) != 0)
 			return (cod_error(ERR_MUTEX_INIT));
+		left_right_handed(&sim->tab_coders[i]);
 		i++;
 	}
 	return (true);

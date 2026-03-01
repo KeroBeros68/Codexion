@@ -6,7 +6,7 @@
 /*   By: kebertra <kebertra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 18:59:50 by kebertra          #+#    #+#             */
-/*   Updated: 2026/02/28 23:44:32 by kebertra         ###   ########.fr       */
+/*   Updated: 2026/03/01 14:30:13 by kebertra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ typedef struct s_dongle
 	pthread_mutex_t	lock;
 	pthread_cond_t	cond;
 
+	bool			in_use;
 	uint64_t		time_end_cooldown;
 	t_heap			waitlist;
 }	t_dongle;
@@ -226,6 +227,10 @@ void		wake_all_dongles(t_sim *sim);
 void		heap_push(t_heap *heap, t_heap_node node);
 t_heap_node	heap_pop(t_heap *heap);
 t_heap_node	heap_peek(t_heap *heap);
+
+/* ****	Sched ***/
+
+uint64_t	scheduler(t_coder *coder);
 
 /* ****	Error ***/
 
